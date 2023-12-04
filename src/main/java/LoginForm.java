@@ -1,0 +1,44 @@
+import DAO.DatabaseRepository;
+import com.sun.nio.sctp.Notification;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+public class LoginForm extends JFrame{
+    private JPanel panelTitle;
+    private JPanel panelMain;
+    private JPanel panelFied;
+    private JPasswordField textFieldPassword;
+    private JButton ButtonLogin;
+    private JTextField textFieldUsername;
+
+    public LoginForm() throws HeadlessException {
+        setContentPane(panelMain);
+        setTitle("Login");
+        setSize(550,450);
+        setVisible(true);
+        setLocationRelativeTo(null);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        ButtonLogin.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                DatabaseRepository databaseRepository = new DatabaseRepository();
+//                System.out.println(textFieldUsername.getText()+ " --- " + new String(textFieldPassword.getPassword()));
+                String role = databaseRepository.login(textFieldUsername.getText(),new String(textFieldPassword.getPassword()));
+//                System.out.println(role);
+                if (role!=null) {
+                    MainForm mainForm = new MainForm();
+                    dispose();
+                } else {
+                    JOptionPane.showMessageDialog(panelTitle,"Access Denied!");
+                }
+            }
+        });
+    }
+
+    private void createUIComponents() {
+        // TODO: place custom component creation code here
+    }
+}
