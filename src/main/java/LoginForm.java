@@ -5,6 +5,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.HashMap;
 
 public class LoginForm extends JFrame{
     private JPanel panelTitle;
@@ -26,14 +27,16 @@ public class LoginForm extends JFrame{
             public void actionPerformed(ActionEvent e) {
                 DatabaseRepository databaseRepository = new DatabaseRepository();
 //                System.out.println(textFieldUsername.getText()+ " --- " + new String(textFieldPassword.getPassword()));
-                String role = databaseRepository.login(textFieldUsername.getText(),new String(textFieldPassword.getPassword()));
-//                System.out.println(role);
-                if (role!=null) {
-                    MainForm mainForm = new MainForm();
+                HashMap<String,String> user = databaseRepository.login(textFieldUsername.getText(),new String(textFieldPassword.getPassword()));
+
+                if (user!=null) {
+                    MainForm mainForm = new MainForm(user);
                     dispose();
                 } else {
                     JOptionPane.showMessageDialog(panelTitle,"Access Denied!");
+                    return;
                 }
+                System.out.println(user.get("user_name"));
             }
         });
     }
