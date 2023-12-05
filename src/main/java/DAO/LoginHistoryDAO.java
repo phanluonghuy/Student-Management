@@ -72,4 +72,12 @@ public class LoginHistoryDAO {
 
         return accounts;
     }
+
+    public void addLoginHistory(){
+        try (Connection conn = getConnection()){
+            String query = "INSERT INTO ";
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

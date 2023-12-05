@@ -94,7 +94,7 @@
                 </constraints>
                 <properties>
                   <font size="20"/>
-                  <margin top="5" left="15" bottom="5" right="15"/>
+                  <margin top="2" left="6" bottom="2" right="6"/>
                   <text value=""/>
                 </properties>
               </component>

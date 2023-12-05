@@ -3,6 +3,7 @@ package DAO;
 import Model.Users;
 
 import java.sql.Connection;
+import java.util.List;
 
 public class UsersDAO {
     private DatabaseRepository databaseRepository;
@@ -18,8 +19,8 @@ public class UsersDAO {
         databaseRepository.closeConnection(conn);
     }
 
-    public Users getUsers(){
-
-        return new Users();
+    public List<Users> getUsers(){
+        SiteDAO siteDAO = new SiteDAO();
+        return siteDAO.getUser();
     }
 }
