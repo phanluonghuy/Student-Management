@@ -1,5 +1,7 @@
 package DAO;
 
+import Model.Users;
+
 import java.sql.Connection;
 
 public class UsersDAO {
@@ -14,5 +16,10 @@ public class UsersDAO {
 
     private void closeConnection(Connection conn){
         databaseRepository.closeConnection(conn);
+    }
+
+    public Users getUsers(){
+
+        return new Users();
     }
 }
