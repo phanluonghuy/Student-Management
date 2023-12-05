@@ -1,4 +1,5 @@
 import DAO.DatabaseRepository;
+import DAO.SiteDAO;
 import com.sun.nio.sctp.Notification;
 
 import javax.swing.*;
@@ -22,22 +23,19 @@ public class LoginForm extends JFrame{
         setVisible(true);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        ButtonLogin.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                DatabaseRepository databaseRepository = new DatabaseRepository();
+        ButtonLogin.addActionListener(e -> {
+            SiteDAO siteDAO = new SiteDAO();
 //                System.out.println(textFieldUsername.getText()+ " --- " + new String(textFieldPassword.getPassword()));
-                HashMap<String,String> user = databaseRepository.login(textFieldUsername.getText(),new String(textFieldPassword.getPassword()));
+            HashMap<String,String> user = siteDAO.login(textFieldUsername.getText(),new String(textFieldPassword.getPassword()));
 
-                if (user!=null) {
-                    MainForm mainForm = new MainForm(user);
-                    dispose();
-                } else {
-                    JOptionPane.showMessageDialog(panelTitle,"Access Denied!");
-                    return;
-                }
-                System.out.println(user.get("user_name"));
+            if (user!=null) {
+                MainForm mainForm = new MainForm(user);
+                dispose();
+            } else {
+                JOptionPane.showMessageDialog(panelTitle,"Access Denied!");
+                return;
             }
+//                System.out.println(user.get("user_name"));
         });
     }
 
