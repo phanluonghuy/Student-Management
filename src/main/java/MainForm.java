@@ -38,22 +38,6 @@ public class MainForm extends JFrame {
         setVisible(true);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         showAllUsers();
-//        DefaultTableModel tableModel = new DefaultTableModel();
-//
-//        tableModel.addColumn("User ID");
-//        tableModel.addColumn("Full Name");
-//        tableModel.addColumn("Age");
-//        tableModel.addColumn("Phone");
-//        tableModel.addColumn("Image Profile");
-//        tableModel.addColumn("Is Active");
-//
-//        List<Users> user_data = siteDAO.getUser();
-//
-//        for (Users u : user_data) {
-//            tableModel.addRow(new Object[]{u.getUser_id(), u.getFullname(), u.getAge(),
-//                    u.getPhone(), u.getImg_profile(), u.getIsActive()});
-//        }
-//        tableData.setModel(tableModel);
 
         buttonLoginHistory.addActionListener(e -> {
             showLoginHistory();
