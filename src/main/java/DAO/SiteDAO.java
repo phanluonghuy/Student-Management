@@ -2,10 +2,7 @@ package DAO;
 
 import Model.Users;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,6 +10,8 @@ import java.util.List;
 public class SiteDAO {
 
     private DatabaseRepository databaseRepository;
+    private static final String GET_USERS = "SELECT * FROM users";
+    private static final String MAX_USER_ID = "SELECT MAX(user_id) from users";
     public SiteDAO(){
         this.databaseRepository = new DatabaseRepository();
     }
@@ -56,8 +55,7 @@ public class SiteDAO {
         List<Users> userList = new ArrayList<>();
 
         try (Connection conn = getConnection()) {
-            String query = "SELECT * FROM users";
-            try (PreparedStatement statement = conn.prepareStatement(query);
+            try (PreparedStatement statement = conn.prepareStatement(GET_USERS);
                  ResultSet resultSet = statement.executeQuery()) {
 
                 while (resultSet.next()) {
@@ -72,9 +70,32 @@ public class SiteDAO {
             }
             closeConnection(conn);
         } catch (SQLException e) {
-            throw new RuntimeException("Error fetching users from the database", e);
+            throw new RuntimeException("Error getting users", e);
         }
 
         return userList;
     }
+    public String AUTO_ACC_USER_ID(){
+        String nextUserID = "";
+        try (Connection conn = getConnection();
+             PreparedStatement statement = conn.prepareStatement(MAX_USER_ID);){
+            ResultSet resultSet = statement.executeQuery();
+            int currentID = 0;
+
+            if(resultSet.next()){
+                String maxID = resultSet.getString(1);
+                if(maxID != null && maxID.startsWith("user_")){
+                    currentID = Integer.parseInt(maxID.substring(5));
+                }
+            }
+
+            int nextID = currentID + 1;
+            nextUserID = "user_" + String.format("%05d", nextID);
+
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+        return nextUserID;
+    }
+
 }

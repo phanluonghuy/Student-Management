@@ -10,6 +10,7 @@ import java.util.List;
 public class LoginHistoryDAO {
 
     private DatabaseRepository databaseRepository;
+    private static final String GET_ACC_BY_ID = "SELECT * FROM accounts where account_id = ?";
     public LoginHistoryDAO(){
         this.databaseRepository = new DatabaseRepository();
     }
@@ -40,7 +41,7 @@ public class LoginHistoryDAO {
             }
             closeConnection(connection);
         } catch (SQLException e) {
-            throw new RuntimeException("Error fetching users from the database", e);
+            throw new RuntimeException("Error getting login history", e);
         }
 
         return historyList;
@@ -51,9 +52,7 @@ public class LoginHistoryDAO {
         Accounts accounts = null;
 
         try (Connection conn = getConnection()) {
-            String query = "SELECT * FROM accounts " +
-                    "where account_id = ?";
-            PreparedStatement statement = conn.prepareStatement(query);
+            PreparedStatement statement = conn.prepareStatement(GET_ACC_BY_ID);
             statement.setString(1, id);
             ResultSet resultSet = statement.executeQuery();
 
@@ -67,7 +66,7 @@ public class LoginHistoryDAO {
             }
             closeConnection(conn);
         } catch (SQLException e) {
-            throw new RuntimeException("Error fetching users from the database", e);
+            throw new RuntimeException("Error getting accounts", e);
         }
 
         return accounts;
