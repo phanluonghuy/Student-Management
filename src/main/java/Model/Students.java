@@ -18,5 +18,4 @@ public class Students {
     private String home_address;
     private String phone;
     private float GPA;
-
 }

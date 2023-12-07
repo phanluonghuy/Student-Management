@@ -11,7 +11,8 @@ public class SiteDAO {
 
     private DatabaseRepository databaseRepository;
     private static final String GET_USERS = "SELECT * FROM users";
-    private static final String MAX_USER_ID = "SELECT MAX(user_id) from users";
+    private static final String MAX_USER_ID = "SELECT MAX(user_id) FROM users";
+    private static final String MAX_STUDENT_ID = "SELECT MAX(student_id) FROM students";
     public SiteDAO(){
         this.databaseRepository = new DatabaseRepository();
     }
@@ -78,7 +79,7 @@ public class SiteDAO {
     public String AUTO_ACC_USER_ID(){
         String nextUserID = "";
         try (Connection conn = getConnection();
-             PreparedStatement statement = conn.prepareStatement(MAX_USER_ID);){
+             PreparedStatement statement = conn.prepareStatement(MAX_USER_ID)){
             ResultSet resultSet = statement.executeQuery();
             int currentID = 0;
 
@@ -98,4 +99,26 @@ public class SiteDAO {
         return nextUserID;
     }
 
+    public String AUTO_STUDENT_ID() {
+        String nextStudentID = "";
+        try (Connection conn = getConnection();
+             PreparedStatement statement = conn.prepareStatement(MAX_STUDENT_ID)){
+            ResultSet resultSet = statement.executeQuery();
+            int currentID = 0;
+
+            if(resultSet.next()){
+                String maxID = resultSet.getString(1);
+                if(maxID != null && maxID.startsWith("STU")){
+                    currentID = Integer.parseInt(maxID.substring(3));
+                }
+            }
+
+            int nextID = currentID + 1;
+            nextStudentID = "STU" + String.format("%06d", nextID);
+
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+        return nextStudentID;
+    }
 }
