@@ -6,16 +6,19 @@ import Model.Accounts;
 import Model.History;
 import Model.Students;
 import Model.Users;
+import okhttp3.*;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-
+import org.json.JSONArray;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.io.FileOutputStream;
@@ -25,6 +28,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class MainForm extends JFrame {
     private JPanel panelMain;
@@ -50,7 +55,7 @@ public class MainForm extends JFrame {
     private JLabel txtName;
     private JTextField edtPhone;
     private JTextField edtGender_Img;
-    private JTextField edtAddress_Status;
+//    private JTextField edtAddress_Status;
     private JTextField edtDOB;
     private JTextField edtGPA;
     private JLabel txtGender_Img;
@@ -62,6 +67,8 @@ public class MainForm extends JFrame {
     private JButton importStudentButton;
     private JButton exportStudentButton;
     private JButton manageCertificateButton;
+    private JComboBox comboStatus_Country;
+    private JComboBox comboBoxGender;
     private SiteDAO siteDAO = new SiteDAO();
     private UsersDAO usersDAO = new UsersDAO();
     private LoginHistoryDAO loginHistoryDAO = new LoginHistoryDAO();
@@ -85,6 +92,7 @@ public class MainForm extends JFrame {
         fillData();
         disabledField();
 
+//        button action
         buttonAddUser.addActionListener(e -> {
             if ("Add User".equals(buttonAddUser.getText())){
                 addUser();
@@ -168,6 +176,14 @@ public class MainForm extends JFrame {
         exportStudentButton.addActionListener(e -> {
             exportStudentToXls();
         });
+
+        buttonLogout.addActionListener(e -> {
+            int resp = JOptionPane.showConfirmDialog(this, "Are you sure to logging out?", "Notice", JOptionPane.YES_NO_OPTION);
+            if (resp == JOptionPane.YES_NO_OPTION){
+                LoginForm loginForm = new LoginForm();
+                dispose();
+            }
+        });
     }
 
 //    UI Function
@@ -185,7 +201,6 @@ public class MainForm extends JFrame {
         });
     }
 
-
     private void fillEditText(int selectRow){
         if ("Add User".equals(buttonAddUser.getText()) && txtAge.getText().equals("Age")) {
             if (selectRow >= 0 && selectRow < tableData.getModel().getRowCount()){
@@ -193,7 +208,8 @@ public class MainForm extends JFrame {
                 edtName.setText(tableData.getValueAt(selectRow, 1).toString());
                 edtAge.setText(tableData.getValueAt(selectRow, 2).toString());
                 edtPhone.setText(tableData.getValueAt(selectRow, 3).toString());
-                edtAddress_Status.setText(tableData.getValueAt(selectRow, 4).toString());
+//                edtAddress_Status.setText(tableData.getValueAt(selectRow, 4).toString());
+                fillUsersStatusData(tableData.getValueAt(selectRow, 0).toString());
                 edtAge.setEnabled(true);
             }
         } else if ("Add Student".equals(buttonAddUser.getText()) && txtAge.getText().equals("Age")) {
@@ -202,9 +218,11 @@ public class MainForm extends JFrame {
                 edtName.setText(tableData.getValueAt(selectRow, 1).toString());
                 edtPhone.setText(tableData.getValueAt(selectRow, 5).toString());
                 edtGender_Img.setText(tableData.getValueAt(selectRow, 3).toString());
-                edtAddress_Status.setText(tableData.getValueAt(selectRow,4).toString());
+//                edtAddress_Status.setText(tableData.getValueAt(selectRow,4).toString());
+                fillDataGender();
                 edtDOB.setText(tableData.getValueAt(selectRow,2).toString());
                 edtGPA.setText(tableData.getValueAt(selectRow,6).toString());
+                fillDataCountry();
                 edtAge.setEnabled(false);
             }
         }else if (txtPhone.getText().equals("Role")){
@@ -213,7 +231,7 @@ public class MainForm extends JFrame {
                 edtName.setText(tableData.getValueAt(selectRow, 1).toString());
                 edtAge.setText(tableData.getValueAt(selectRow, 2).toString());
                 edtPhone.setText(tableData.getValueAt(selectRow, 3).toString());
-                edtAddress_Status.setText(tableData.getValueAt(selectRow, 4).toString());
+//                edtAddress_Status.setText(tableData.getValueAt(selectRow, 4).toString());
                 edtAge.setEnabled(true);
             }
         }
@@ -230,8 +248,11 @@ public class MainForm extends JFrame {
             exportStudentButton.setVisible(false);
             manageCertificateButton.setVisible(false);
             clearEdtText();
+            comboStatus_Country.setVisible(true);
+            comboBoxGender.setVisible(false);
             txtGender_Img.setVisible(false);
             edtGender_Img.setVisible(false);
+//            edtAddress_Status.setVisible(false);
             txtDOB.setVisible(false);
             edtDOB.setVisible(false);
             txtGPA.setVisible(false);
@@ -248,8 +269,11 @@ public class MainForm extends JFrame {
             exportStudentButton.setVisible(true);
             manageCertificateButton.setVisible(true);
             clearEdtText();
+            comboStatus_Country.setVisible(true);
+            comboBoxGender.setVisible(true);
+//            edtAddress_Status.setVisible(false);
             txtGender_Img.setVisible(true);
-            edtGender_Img.setVisible(true);
+            edtGender_Img.setVisible(false);
             txtDOB.setVisible(true);
             edtDOB.setVisible(true);
             txtGPA.setVisible(true);
@@ -264,6 +288,7 @@ public class MainForm extends JFrame {
             exportStudentButton.setVisible(false);
             manageCertificateButton.setVisible(false);
             clearEdtText();
+            comboBoxGender.setVisible(false);
             txtGender_Img.setVisible(false);
             edtGender_Img.setVisible(false);
             txtDOB.setVisible(false);
@@ -274,12 +299,14 @@ public class MainForm extends JFrame {
     }
 
     private void clearEdtText(){
+        DefaultComboBoxModel<String> comboBoxModel = (DefaultComboBoxModel<String>) comboStatus_Country.getModel();
         edtID.setText("");
         edtName.setText("");
         edtAge.setText("");
         edtPhone.setText("");
         edtGender_Img.setText("");
-        edtAddress_Status.setText("");
+        comboBoxModel.removeAllElements();
+//        edtAddress_Status.setText("");
         edtDOB.setText("");
         edtGPA.setText("");
     }
@@ -305,13 +332,44 @@ public class MainForm extends JFrame {
         });
     }
 
+    private void fillDataGender(){
+        DefaultComboBoxModel<String> comboBoxModel = new DefaultComboBoxModel();
+        comboBoxModel.addElement("Male");
+        comboBoxModel.addElement("Female");
+        comboBoxGender.setModel(comboBoxModel);
+    }
+
+    private void fillDataCountry(){
+        DefaultComboBoxModel<String> comboBoxModel = new DefaultComboBoxModel();
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        executorService.execute(() -> {
+            String apiUrl = "https://provinces.open-api.vn/api/";
+            OkHttpClient okHttpClient = new OkHttpClient();
+            Request request = new Request.Builder()
+                    .url(apiUrl)
+                    .build();
+            try {
+                Response response = okHttpClient.newCall(request).execute();
+                String responseData = response.body().string();
+                JSONArray data = new JSONArray(responseData);
+                for (int i = 0; i < data.length(); i++) {
+                    String name = data.getJSONObject(i).getString("name");
+                    comboBoxModel.addElement(name);
+                }
+                comboStatus_Country.setModel(comboBoxModel);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+
+    }
 //    Logic Function
 
     private void exportStudentToXls(){
         DefaultTableModel model = (DefaultTableModel) tableData.getModel();
 
         try (Workbook workbook = new XSSFWorkbook()) {
-            Sheet sheet = workbook.createSheet("Student Data");
+            Sheet sheet = workbook.createSheet("Student List");
             Cell cell = null;
             Row headerRow = sheet.createRow(0);
             for (int col = 0; col < model.getColumnCount(); col++) {
@@ -348,7 +406,7 @@ public class MainForm extends JFrame {
         Integer age = Integer.parseInt(edtAge.getText());
         String phone = edtPhone.getText();
         String img = edtGender_Img.getText();
-        String status = edtAddress_Status.getText();
+        String status = comboStatus_Country.getSelectedItem().toString();
         usersDAO.updateUsers(id, new Users(id, name, age, phone, img, status));
         clearEdtText();
         showAllUsers().fireTableDataChanged();
@@ -362,13 +420,13 @@ public class MainForm extends JFrame {
 
     private void addUser(){
         if(!edtName.getText().toString().isEmpty() || !edtAge.getText().toString().isEmpty() || !edtPhone.getText().isEmpty()
-        || !edtGender_Img.getText().toString().isEmpty() || !edtAddress_Status.getText().toString().isEmpty()){
+        || !edtGender_Img.getText().toString().isEmpty()){
 
             String name = edtName.getText();
             Integer age = Integer.parseInt(edtAge.getText());
             String phone = edtPhone.getText();
             String img_profile = edtGender_Img.getText();
-            String status = edtAddress_Status.getText();
+            String status = comboStatus_Country.getSelectedItem().toString();
             usersDAO.addUsers(new Users("", name, age, phone, img_profile, status));
             clearEdtText();
             showAllUsers().fireTableDataChanged();
@@ -380,6 +438,19 @@ public class MainForm extends JFrame {
     private void addEmptyRow(DefaultTableModel tableModel){
         Object[] empRow = null;
         tableModel.addRow(empRow);
+    }
+
+    private void fillUsersStatusData(String id){
+        DefaultComboBoxModel<String> comboBoxModel = new DefaultComboBoxModel();
+        String status = usersDAO.getUsersStatus(id);
+        if (status.equals("Normal")){
+            comboBoxModel.addElement(status);
+            comboBoxModel.addElement("Locked");
+        }else{
+            comboBoxModel.addElement(status);
+            comboBoxModel.addElement("Normal");
+        }
+        comboStatus_Country.setModel(comboBoxModel);
     }
 
     private DefaultTableModel showAllUsers(){
@@ -458,7 +529,7 @@ public class MainForm extends JFrame {
 
     private void addStudent() {
         if(!edtName.getText().toString().isEmpty() || !edtPhone.getText().isEmpty()
-                || !edtGender_Img.getText().toString().isEmpty() || !edtAddress_Status.getText().toString().isEmpty()
+                || !edtGender_Img.getText().toString().isEmpty()
                 || !edtDOB.getText().toString().isEmpty() ||!edtGPA.getText().isEmpty()) {
 
             String name = edtName.getText();
@@ -471,7 +542,7 @@ public class MainForm extends JFrame {
                 throw new RuntimeException(e);
             }
             String gender = edtGender_Img.getText();
-            String address = edtAddress_Status.getText();
+            String address = comboStatus_Country.getSelectedItem().toString();
             String phone = edtPhone.getText();
             float gpa = Math.round(Float.parseFloat(edtGPA.getText()))* 10/10.0f;
 
@@ -494,7 +565,7 @@ public class MainForm extends JFrame {
         String name = edtName.getText();
         String phone = edtPhone.getText();
         String gender = edtGender_Img.getText();
-        String address = edtAddress_Status.getText();
+        String address = comboStatus_Country.getSelectedItem().toString();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         Date birth = null;
         try {
