@@ -96,15 +96,25 @@ public class MainForm extends JFrame {
         buttonDeleteUser.addActionListener(e -> {
             if ("Delete User".equals(buttonDeleteUser.getText())){
                 int selectRow = tableData.getSelectedRow();
-                if (selectRow != -1){
-                    deleteUser(tableData.getValueAt(selectRow, 0).toString());
+                if(selectRow != - 1) {
+                    int resp = JOptionPane.showConfirmDialog(this, "Are you sure to delete "+tableData.getValueAt(selectRow, 0).toString(), "Delete Confirmation", JOptionPane.YES_NO_OPTION);
+                    if (resp == JOptionPane.YES_NO_OPTION){
+                        deleteUser(tableData.getValueAt(selectRow, 0).toString());
+                    }else{
+                        JOptionPane.showMessageDialog(this, "Delete Canceled", "Notice", JOptionPane.INFORMATION_MESSAGE);
+                    }
                 }else{
                     JOptionPane.showMessageDialog(this, "There is no data to delete", "Warning", JOptionPane.WARNING_MESSAGE);
                 }
             } else if ("Delete Student".equals(buttonDeleteUser.getText())) {
                 int selectRow = tableData.getSelectedRow();
                 if(selectRow != - 1) {
-                    deleteStudent(tableData.getValueAt(selectRow, 0).toString());
+                    int resp = JOptionPane.showConfirmDialog(this, "Are you sure to delete "+tableData.getValueAt(selectRow, 0).toString(), "Delete Confirmation", JOptionPane.YES_NO_OPTION);
+                    if (resp == JOptionPane.YES_NO_OPTION){
+                        deleteStudent(tableData.getValueAt(selectRow, 0).toString());
+                    }else{
+                        JOptionPane.showMessageDialog(this, "Delete Canceled", "Notice", JOptionPane.INFORMATION_MESSAGE);
+                    }
                 }else {
                     JOptionPane.showMessageDialog(this, "There is no data to delete", "Warning", JOptionPane.WARNING_MESSAGE);
                 }
@@ -115,12 +125,22 @@ public class MainForm extends JFrame {
             if ("Update User".equals(buttonUpdateUser.getText())){
                 int selectRow = tableData.getSelectedRow();
                 if(selectRow != -1){
-                    updateUser(tableData.getValueAt(selectRow, 0).toString());
+                    int resp = JOptionPane.showConfirmDialog(this, "Are you sure to update "+ tableData.getValueAt(selectRow, 0).toString(), "Update Confirmation", JOptionPane.YES_NO_OPTION);
+                    if(resp == JOptionPane.YES_NO_OPTION){
+                        updateUser(tableData.getValueAt(selectRow, 0).toString());
+                    }else {
+                        JOptionPane.showMessageDialog(this, "Update Canceled", "Notice", JOptionPane.INFORMATION_MESSAGE);
+                    }
                 }
             } else if ("Update Student".equals(buttonUpdateUser.getText())) {
                 int selectRow = tableData.getSelectedRow();
-                if(selectRow != -1) {
-                    updateStudent(tableData.getValueAt(selectRow, 0).toString());
+                if(selectRow != -1){
+                    int resp = JOptionPane.showConfirmDialog(this, "Are you sure to update "+ tableData.getValueAt(selectRow, 0).toString(), "Update Confirmation", JOptionPane.YES_NO_OPTION);
+                    if(resp == JOptionPane.YES_NO_OPTION){
+                        updateStudent(tableData.getValueAt(selectRow, 0).toString());
+                    }else {
+                        JOptionPane.showMessageDialog(this, "Update Canceled", "Notice", JOptionPane.INFORMATION_MESSAGE);
+                    }
                 }
             }
         });
@@ -168,7 +188,6 @@ public class MainForm extends JFrame {
 
     private void fillEditText(int selectRow){
         if ("Add User".equals(buttonAddUser.getText()) && txtAge.getText().equals("Age")) {
-//            System.out.println(selectRow);
             if (selectRow >= 0 && selectRow < tableData.getModel().getRowCount()){
                 edtID.setText(tableData.getValueAt(selectRow, 0).toString());
                 edtName.setText(tableData.getValueAt(selectRow, 1).toString());
