@@ -2,6 +2,7 @@ package DAO;
 
 import Model.Accounts;
 import Model.History;
+import Model.Roles;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -11,6 +12,7 @@ public class LoginHistoryDAO {
 
     private DatabaseRepository databaseRepository;
     private static final String GET_ACC_BY_ID = "SELECT * FROM accounts where account_id = ?";
+    private static final String GET_ROLE_BY_ID = "SELECT * FROM roles where role_id = ?";
     public LoginHistoryDAO(){
         this.databaseRepository = new DatabaseRepository();
     }
@@ -70,6 +72,26 @@ public class LoginHistoryDAO {
         }
 
         return accounts;
+    }
+
+    public String getRoleByAccId(String id){
+        Roles roles = null;
+
+        try (Connection conn = getConnection()) {
+            PreparedStatement statement = conn.prepareStatement(GET_ROLE_BY_ID);
+            statement.setString(1, id);
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet.next()) {
+                String role_name = resultSet.getString("role_name");
+                roles = new Roles(id, role_name);
+            }
+            closeConnection(conn);
+        } catch (SQLException e) {
+            throw new RuntimeException("Error getting accounts", e);
+        }
+
+        return roles.getRole_name();
     }
 
     public void addLoginHistory(){
