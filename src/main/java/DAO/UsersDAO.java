@@ -33,6 +33,27 @@ public class UsersDAO {
         return siteDAO.getUser();
     }
 
+    public Users getUsersById(String id){
+        Users users = null;
+        try (Connection conn = getConnection()) {
+            PreparedStatement statement = conn.prepareStatement(GET_USERS_STATUS);
+            statement.setString(1, id);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()){
+                String name = resultSet.getString("full_name");
+                int age = resultSet.getInt("age");
+                String phone = resultSet.getString("phone_number");
+                String img = resultSet.getString("image_profile");
+                String status = resultSet.getString("status_user");
+                users = new Users(id, name, age, phone, img, status);
+            }
+            closeConnection(conn);
+        } catch (SQLException e) {
+            throw new RuntimeException("Error adding users", e);
+        }
+        return users;
+    }
+
     public void deleteUsers(String id){
         try (Connection conn = getConnection()) {
             PreparedStatement statement = conn.prepareStatement(DELETE_USERS);
