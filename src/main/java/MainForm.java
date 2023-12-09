@@ -168,6 +168,17 @@ public class MainForm extends JFrame {
         exportStudentButton.addActionListener(e -> {
             exportStudentToXls();
         });
+
+        manageCertificateButton.addActionListener(e -> {
+            String studentID = edtID.getText();
+            if (studentID.isEmpty()) {
+                JOptionPane.showMessageDialog(panelMain,"No student selected!");
+                return;
+            }
+            System.out.println(studentID);
+            CertificateFrom certificate = new CertificateFrom(studentID);
+        });
+
     }
 
 //    UI Function
@@ -342,7 +353,7 @@ public class MainForm extends JFrame {
         }
     }
 
-//    <!-- CRUD Users --!>
+    //    <!-- CRUD Users --!>
     private void updateUser(String id){
         String name = edtName.getText();
         Integer age = Integer.parseInt(edtAge.getText());
@@ -362,7 +373,7 @@ public class MainForm extends JFrame {
 
     private void addUser(){
         if(!edtName.getText().toString().isEmpty() || !edtAge.getText().toString().isEmpty() || !edtPhone.getText().isEmpty()
-        || !edtGender_Img.getText().toString().isEmpty() || !edtAddress_Status.getText().toString().isEmpty()){
+                || !edtGender_Img.getText().toString().isEmpty() || !edtAddress_Status.getText().toString().isEmpty()){
 
             String name = edtName.getText();
             Integer age = Integer.parseInt(edtAge.getText());
@@ -447,7 +458,7 @@ public class MainForm extends JFrame {
                             students.getHome_address(),
                             students.getPhone(),
                             students.getGPA()
-            });
+                    });
         }
         tableData.setModel(defaultTableModel);
         adjustColumnWidth(3,20);
