@@ -397,7 +397,8 @@ public class MainForm extends JFrame {
             float gpa = Float.parseFloat(gpaText);
             String formatted_gpa =  String.format("%.2f", gpa);
             gpa = Float.parseFloat(formatted_gpa);
-
+            //Add comment in line 400
+            //Add comment in line 401
             studentsDAO.addStudent(new Students("", studentListId, name, birth, gender, address, phone,gpa));
             clearEdtText();
             fillStudentsData().fireTableDataChanged();
