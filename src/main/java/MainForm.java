@@ -695,6 +695,7 @@ public class MainForm extends JFrame {
         column.setPreferredWidth(width);
     }
 
+    //update 698
     private void disabledField() {
         edtID.setEnabled(false);
     }
