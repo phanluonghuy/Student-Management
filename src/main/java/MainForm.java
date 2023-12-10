@@ -318,6 +318,11 @@ public class MainForm extends JFrame {
                     u.getPhone(), u.getImg_profile(), u.getIsActive()});
         }
         tableData.setModel(tableModel);
+        adjustColumnWidth(0, 20);
+        adjustColumnWidth(1, 150);
+        adjustColumnWidth(2, 20);
+        adjustColumnWidth(3, 150);
+
         return tableModel;
     }
 
