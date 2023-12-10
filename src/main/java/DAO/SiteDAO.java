@@ -114,7 +114,7 @@ public class SiteDAO {
             }
 
             int nextID = currentID + 1;
-            nextStudentID = "STU" + String.format("%06d", nextID);
+            nextStudentID = "STU" + String.format("%07d", nextID);
 
         }catch (SQLException e){
             e.printStackTrace();

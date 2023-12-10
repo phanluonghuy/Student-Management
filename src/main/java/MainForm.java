@@ -6,11 +6,6 @@ import Model.Accounts;
 import Model.History;
 import Model.Students;
 import Model.Users;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -18,8 +13,6 @@ import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -29,6 +22,7 @@ import java.util.List;
 public class MainForm extends JFrame {
     private JPanel panelMain;
     private JButton buttonLogout;
+    private JButton buttonReports;
     private JButton buttonLoginHistory;
     private JButton buttonManagerStudent;
     private JButton buttonDeleteUser;
@@ -60,8 +54,8 @@ public class MainForm extends JFrame {
     private JButton clearButton;
     private JLabel imgView;
     private JButton importStudentButton;
-    private JButton exportStudentButton;
     private JButton manageCertificateButton;
+    private JButton exportStudentButton;
     private SiteDAO siteDAO = new SiteDAO();
     private UsersDAO usersDAO = new UsersDAO();
     private LoginHistoryDAO loginHistoryDAO = new LoginHistoryDAO();
@@ -96,25 +90,15 @@ public class MainForm extends JFrame {
         buttonDeleteUser.addActionListener(e -> {
             if ("Delete User".equals(buttonDeleteUser.getText())){
                 int selectRow = tableData.getSelectedRow();
-                if(selectRow != - 1) {
-                    int resp = JOptionPane.showConfirmDialog(this, "Are you sure to delete "+tableData.getValueAt(selectRow, 0).toString(), "Delete Confirmation", JOptionPane.YES_NO_OPTION);
-                    if (resp == JOptionPane.YES_NO_OPTION){
-                        deleteUser(tableData.getValueAt(selectRow, 0).toString());
-                    }else{
-                        JOptionPane.showMessageDialog(this, "Delete Canceled", "Notice", JOptionPane.INFORMATION_MESSAGE);
-                    }
+                if (selectRow != -1){
+                    deleteUser(tableData.getValueAt(selectRow, 0).toString());
                 }else{
                     JOptionPane.showMessageDialog(this, "There is no data to delete", "Warning", JOptionPane.WARNING_MESSAGE);
                 }
             } else if ("Delete Student".equals(buttonDeleteUser.getText())) {
                 int selectRow = tableData.getSelectedRow();
                 if(selectRow != - 1) {
-                    int resp = JOptionPane.showConfirmDialog(this, "Are you sure to delete "+tableData.getValueAt(selectRow, 0).toString(), "Delete Confirmation", JOptionPane.YES_NO_OPTION);
-                    if (resp == JOptionPane.YES_NO_OPTION){
-                        deleteStudent(tableData.getValueAt(selectRow, 0).toString());
-                    }else{
-                        JOptionPane.showMessageDialog(this, "Delete Canceled", "Notice", JOptionPane.INFORMATION_MESSAGE);
-                    }
+                    deleteStudent(tableData.getValueAt(selectRow, 0).toString());
                 }else {
                     JOptionPane.showMessageDialog(this, "There is no data to delete", "Warning", JOptionPane.WARNING_MESSAGE);
                 }
@@ -125,22 +109,12 @@ public class MainForm extends JFrame {
             if ("Update User".equals(buttonUpdateUser.getText())){
                 int selectRow = tableData.getSelectedRow();
                 if(selectRow != -1){
-                    int resp = JOptionPane.showConfirmDialog(this, "Are you sure to update "+ tableData.getValueAt(selectRow, 0).toString(), "Update Confirmation", JOptionPane.YES_NO_OPTION);
-                    if(resp == JOptionPane.YES_NO_OPTION){
-                        updateUser(tableData.getValueAt(selectRow, 0).toString());
-                    }else {
-                        JOptionPane.showMessageDialog(this, "Update Canceled", "Notice", JOptionPane.INFORMATION_MESSAGE);
-                    }
+                    updateUser(tableData.getValueAt(selectRow, 0).toString());
                 }
             } else if ("Update Student".equals(buttonUpdateUser.getText())) {
                 int selectRow = tableData.getSelectedRow();
-                if(selectRow != -1){
-                    int resp = JOptionPane.showConfirmDialog(this, "Are you sure to update "+ tableData.getValueAt(selectRow, 0).toString(), "Update Confirmation", JOptionPane.YES_NO_OPTION);
-                    if(resp == JOptionPane.YES_NO_OPTION){
-                        updateStudent(tableData.getValueAt(selectRow, 0).toString());
-                    }else {
-                        JOptionPane.showMessageDialog(this, "Update Canceled", "Notice", JOptionPane.INFORMATION_MESSAGE);
-                    }
+                if(selectRow != -1) {
+                    updateStudent(tableData.getValueAt(selectRow, 0).toString());
                 }
             }
         });
@@ -160,23 +134,7 @@ public class MainForm extends JFrame {
         });
 
         buttonLoginHistory.addActionListener(e -> {
-            onChangeManageData("login");
             showLoginHistory();
-        });
-
-
-        exportStudentButton.addActionListener(e -> {
-            exportStudentToXls();
-        });
-
-        manageCertificateButton.addActionListener(e -> {
-            String studentID = edtID.getText();
-            if (studentID.isEmpty()) {
-                JOptionPane.showMessageDialog(panelMain,"No student selected!");
-                return;
-            }
-            System.out.println(studentID);
-            CertificateFrom certificate = new CertificateFrom(studentID);
         });
 
     }
@@ -191,6 +149,8 @@ public class MainForm extends JFrame {
                 int selectRow = tableData.getSelectedRow();
                 if (selectRow != -1) {
                     fillEditText(selectRow);
+                }else{
+                    JOptionPane.showMessageDialog(this, "No data on row", "Warning", JOptionPane.WARNING_MESSAGE);
                 }
             }
         });
@@ -198,16 +158,18 @@ public class MainForm extends JFrame {
 
 
     private void fillEditText(int selectRow){
-        if ("Add User".equals(buttonAddUser.getText()) && txtAge.getText().equals("Age")) {
+        if ("Add User".equals(buttonAddUser.getText())) {
+//            System.out.println(selectRow);
             if (selectRow >= 0 && selectRow < tableData.getModel().getRowCount()){
                 edtID.setText(tableData.getValueAt(selectRow, 0).toString());
                 edtName.setText(tableData.getValueAt(selectRow, 1).toString());
                 edtAge.setText(tableData.getValueAt(selectRow, 2).toString());
                 edtPhone.setText(tableData.getValueAt(selectRow, 3).toString());
-                edtAddress_Status.setText(tableData.getValueAt(selectRow, 4).toString());
+                edtGender_Img.setText(tableData.getValueAt(selectRow, 4).toString());
+                edtAddress_Status.setText(tableData.getValueAt(selectRow, 5).toString());
                 edtAge.setEnabled(true);
             }
-        } else if ("Add Student".equals(buttonAddUser.getText()) && txtAge.getText().equals("Age")) {
+        } else if ("Add Student".equals(buttonAddUser.getText())) {
             if(selectRow >=0 && selectRow < tableData.getModel().getRowCount()){
                 edtID.setText(tableData.getValueAt(selectRow, 0).toString());
                 edtName.setText(tableData.getValueAt(selectRow, 1).toString());
@@ -217,15 +179,6 @@ public class MainForm extends JFrame {
                 edtDOB.setText(tableData.getValueAt(selectRow,2).toString());
                 edtGPA.setText(tableData.getValueAt(selectRow,6).toString());
                 edtAge.setEnabled(false);
-            }
-        }else if (txtPhone.getText().equals("Role")){
-            if (selectRow >= 0 && selectRow < tableData.getModel().getRowCount()){
-                edtID.setText(tableData.getValueAt(selectRow, 0).toString());
-                edtName.setText(tableData.getValueAt(selectRow, 1).toString());
-                edtAge.setText(tableData.getValueAt(selectRow, 2).toString());
-                edtPhone.setText(tableData.getValueAt(selectRow, 3).toString());
-                edtAddress_Status.setText(tableData.getValueAt(selectRow, 4).toString());
-                edtAge.setEnabled(true);
             }
         }
     }
@@ -237,12 +190,7 @@ public class MainForm extends JFrame {
             buttonDeleteUser.setText("Delete User");
             txtGender_Img.setText("Image Profile");
             txtAddress_Status.setText("Status");
-            importStudentButton.setVisible(false);
-            exportStudentButton.setVisible(false);
-            manageCertificateButton.setVisible(false);
             clearEdtText();
-            txtGender_Img.setVisible(false);
-            edtGender_Img.setVisible(false);
             txtDOB.setVisible(false);
             edtDOB.setVisible(false);
             txtGPA.setVisible(false);
@@ -251,36 +199,13 @@ public class MainForm extends JFrame {
             buttonAddUser.setText("Add Student");
             buttonUpdateUser.setText("Update Student");
             buttonDeleteUser.setText("Delete Student");
-            txtAge.setText("Age");
-            txtPhone.setText("Phone number");
             txtGender_Img.setText("Gender");
             txtAddress_Status.setText("Address");
-            importStudentButton.setVisible(true);
-            exportStudentButton.setVisible(true);
-            manageCertificateButton.setVisible(true);
             clearEdtText();
-            txtGender_Img.setVisible(true);
-            edtGender_Img.setVisible(true);
             txtDOB.setVisible(true);
             edtDOB.setVisible(true);
             txtGPA.setVisible(true);
             edtGPA.setVisible(true);
-        } else if (msg.equals("login")) {
-            txtGender_Img.setText("Image Profile");
-            txtAddress_Status.setText("Status");
-            txtAge.setText("Password");
-            txtPhone.setText("Role");
-            txtAddress_Status.setText("Date Perform");
-            importStudentButton.setVisible(false);
-            exportStudentButton.setVisible(false);
-            manageCertificateButton.setVisible(false);
-            clearEdtText();
-            txtGender_Img.setVisible(false);
-            edtGender_Img.setVisible(false);
-            txtDOB.setVisible(false);
-            edtDOB.setVisible(false);
-            txtGPA.setVisible(false);
-            edtGPA.setVisible(false);
         }
     }
 
@@ -317,43 +242,6 @@ public class MainForm extends JFrame {
     }
 
 //    Logic Function
-
-    private void exportStudentToXls(){
-        DefaultTableModel model = (DefaultTableModel) tableData.getModel();
-
-        try (Workbook workbook = new XSSFWorkbook()) {
-            Sheet sheet = workbook.createSheet("Student Data");
-            Cell cell = null;
-            Row headerRow = sheet.createRow(0);
-            for (int col = 0; col < model.getColumnCount(); col++) {
-                cell = headerRow.createCell(col);
-                cell.setCellValue(model.getColumnName(col));
-            }
-
-            for (int row = 0; row < model.getRowCount(); row++) {
-                Row dataRow = sheet.createRow(row + 1);
-                for (int col = 0; col < model.getColumnCount(); col++) {
-                    cell = dataRow.createCell(col);
-                    cell.setCellValue(model.getValueAt(row, col).toString());
-                }
-            }
-            writeFileXls(workbook, "student_data");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void writeFileXls(Workbook workbook, String filename){
-        try (FileOutputStream fileOut = new FileOutputStream(filename+".xlsx")) {
-            workbook.write(fileOut);
-            JOptionPane.showMessageDialog(null, "Exported to Excel successfully");
-            workbook.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    //    <!-- CRUD Users --!>
     private void updateUser(String id){
         String name = edtName.getText();
         Integer age = Integer.parseInt(edtAge.getText());
@@ -373,7 +261,7 @@ public class MainForm extends JFrame {
 
     private void addUser(){
         if(!edtName.getText().toString().isEmpty() || !edtAge.getText().toString().isEmpty() || !edtPhone.getText().isEmpty()
-                || !edtGender_Img.getText().toString().isEmpty() || !edtAddress_Status.getText().toString().isEmpty()){
+        || !edtGender_Img.getText().toString().isEmpty() || !edtAddress_Status.getText().toString().isEmpty()){
 
             String name = edtName.getText();
             Integer age = Integer.parseInt(edtAge.getText());
@@ -401,37 +289,35 @@ public class MainForm extends JFrame {
         tableModel.addColumn("Full Name");
         tableModel.addColumn("Age");
         tableModel.addColumn("Phone");
+        tableModel.addColumn("Image Profile");
         tableModel.addColumn("Is Active");
 
         List<Users> user_data = usersDAO.getUsers();
 
         for (Users u : user_data) {
             tableModel.addRow(new Object[]{u.getUser_id(), u.getFullname(), u.getAge(),
-                    u.getPhone(), u.getIsActive()});
+                    u.getPhone(), u.getImg_profile(), u.getIsActive()});
         }
         tableData.setModel(tableModel);
         return tableModel;
     }
-//    <!-- --!>
 
     private void showLoginHistory(){
         DefaultTableModel tableModelHistory = new DefaultTableModel();
         tableModelHistory.addColumn("History ID");
         tableModelHistory.addColumn("User Name");
         tableModelHistory.addColumn("Password");
-        tableModelHistory.addColumn("Role");
+        tableModelHistory.addColumn("Role Id");
         tableModelHistory.addColumn("Date Perform");
 
         List<History> login_history = loginHistoryDAO.getLoginHistory();
 
         Accounts accounts = new Accounts();
-
         for (History history : login_history) {
             accounts = loginHistoryDAO.getAccountsById(history.getAccount_id());
-            String role_id = accounts.getRole_id();
 
             tableModelHistory.addRow(new Object[]{history.getHistory_id(), accounts.getUser_name(), accounts.getPassword(),
-                    loginHistoryDAO.getRoleByAccId(role_id), history.getDate_perform()});
+                    accounts.getRole_id(), history.getDate_perform()});
         }
         tableData.setModel(tableModelHistory);
     }
@@ -458,7 +344,7 @@ public class MainForm extends JFrame {
                             students.getHome_address(),
                             students.getPhone(),
                             students.getGPA()
-                    });
+            });
         }
         tableData.setModel(defaultTableModel);
         adjustColumnWidth(3,20);
@@ -484,7 +370,11 @@ public class MainForm extends JFrame {
             String gender = edtGender_Img.getText();
             String address = edtAddress_Status.getText();
             String phone = edtPhone.getText();
-            float gpa = Math.round(Float.parseFloat(edtGPA.getText()))* 10/10.0f;
+            String gpaText = edtGPA.getText();
+
+            float gpa = Float.parseFloat(gpaText);
+            String formatted_gpa =  String.format("%.2f", gpa);
+            gpa = Float.parseFloat(formatted_gpa);
 
             studentsDAO.addStudent(new Students("", studentListId, name, birth, gender, address, phone,gpa));
             clearEdtText();
@@ -514,7 +404,11 @@ public class MainForm extends JFrame {
             throw new RuntimeException(e);
         }
 
-        float gpa = Math.round(Float.parseFloat(edtGPA.getText()))* 10/10.0f;
+        String gpaText = edtGPA.getText();
+        float gpa = Float.parseFloat(gpaText);
+        String formatted_gpa =  String.format("%.2f", gpa);
+        gpa = Float.parseFloat(formatted_gpa);
+
         studentsDAO.updateStudent(new Students(id, "", name, birth,  gender, address, phone, gpa));
         clearEdtText();
         fillStudentsData().fireTableDataChanged();
