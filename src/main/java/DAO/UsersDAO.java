@@ -14,6 +14,7 @@ public class UsersDAO {
     private static final String ADD_USERS = "INSERT INTO users values (?, ?, ?, ?, ?, ?)";
     private static final String DELETE_USERS = "DELETE FROM users WHERE user_id = ?";
     private static final String UPDATE_USERS = "UPDATE users SET full_name = ?, age = ?, phone_number = ?, image_profile = ?, status_user = ? WHERE user_id = ?";
+    private static final String GET_USERS_STATUS = "SELECT * FROM users WHERE user_id = ?";
     public UsersDAO(){
         this.databaseRepository = new DatabaseRepository();
     }
@@ -89,5 +90,23 @@ public class UsersDAO {
         } catch (SQLException e) {
             throw new RuntimeException("Error updating users", e);
         }
+    }
+
+    public String getUsersStatus(String id){
+        Users users = new Users();
+        try (Connection conn = getConnection()) {
+            PreparedStatement statement = conn.prepareStatement(GET_USERS_STATUS);
+            statement.setString(1, id);
+
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()){
+                String status = resultSet.getString("status_user");
+                users.setIsActive(status);
+            }
+            closeConnection(conn);
+        } catch (SQLException e) {
+            throw new RuntimeException("Error getting users status", e);
+        }
+        return users.getIsActive();
     }
 }

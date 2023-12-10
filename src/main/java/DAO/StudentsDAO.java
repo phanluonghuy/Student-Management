@@ -19,6 +19,8 @@ public class StudentsDAO {
     private DatabaseRepository databaseRepository;
     private static final String GET_STUDENTS = "SELECT * FROM students";
 
+    private static final String GET_STUDENTS_BY_ID = "SELECT * FROM students WHERE student_id = ?";
+
     public StudentsDAO() {
         this.databaseRepository = new DatabaseRepository();
     }
@@ -145,5 +147,28 @@ public class StudentsDAO {
         } catch (SQLException e) {
             throw new RuntimeException("Error updating Student", e);
         }
+    }
+
+    public Students getStudentById(String id){
+        Students students = null;
+        try (Connection conn = getConnection()) {
+            PreparedStatement statement = conn.prepareStatement(GET_STUDENTS_BY_ID);
+            statement.setString(1, id);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()){
+                String student_list_id = resultSet.getString("student_list_id");
+                String fullName = resultSet.getString("full_name");
+                Date birthDay = resultSet.getDate("birthDay");
+                String gender = resultSet.getString("gender");
+                String home_address = resultSet.getString("home_address");
+                String phone = resultSet.getString("phone_number");
+                float gpa = resultSet.getFloat("gpa");
+                students = new Students(id, student_list_id, fullName, birthDay, gender, home_address, phone, gpa);
+            }
+            closeConnection(conn);
+        } catch (SQLException e) {
+            throw new RuntimeException("Error adding users", e);
+        }
+        return students;
     }
 }

@@ -22,16 +22,14 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -66,7 +64,7 @@ public class MainForm extends JFrame {
     private JLabel txtID;
     private JLabel txtName;
     private JTextField edtPhone;
-    private JTextField edtGender_Img;
+//    private JTextField edtGender_Img;
 //    private JTextField edtAddress_Status;
     private JTextField edtDOB;
     private JTextField edtGPA;
@@ -81,7 +79,8 @@ public class MainForm extends JFrame {
     private JButton manageCertificateButton;
     private JComboBox comboStatus_Country;
     private JComboBox comboBoxGender;
-    private JTextField edtAddress_Status;
+    private JTextField edtGender_Img;
+    //    private JTextField edtAddress_Status;
     private SiteDAO siteDAO = new SiteDAO();
     private UsersDAO usersDAO = new UsersDAO();
     private LoginHistoryDAO loginHistoryDAO = new LoginHistoryDAO();
@@ -266,7 +265,7 @@ public class MainForm extends JFrame {
                 edtName.setText(tableData.getValueAt(selectRow, 1).toString());
                 edtAge.setText(tableData.getValueAt(selectRow, 2).toString());
                 edtPhone.setText(tableData.getValueAt(selectRow, 3).toString());
-                edtAddress_Status.setText(tableData.getValueAt(selectRow, 4).toString());
+//                edtAddress_Status.setText(tableData.getValueAt(selectRow, 4).toString());
                 edtAge.setEnabled(true);
             }
         }
@@ -287,7 +286,7 @@ public class MainForm extends JFrame {
             comboBoxGender.setVisible(false);
             txtGender_Img.setVisible(false);
             edtGender_Img.setVisible(false);
-            edtAddress_Status.setVisible(false);
+//            edtAddress_Status.setVisible(false);
             txtDOB.setVisible(false);
             edtDOB.setVisible(false);
             txtGPA.setVisible(false);
@@ -306,7 +305,7 @@ public class MainForm extends JFrame {
             clearEdtText();
             comboStatus_Country.setVisible(true);
             comboBoxGender.setVisible(true);
-            edtAddress_Status.setVisible(false);
+//            edtAddress_Status.setVisible(false);
 //            fillDataDateTime();
             txtGender_Img.setVisible(true);
             edtGender_Img.setVisible(false);
@@ -324,7 +323,7 @@ public class MainForm extends JFrame {
             exportStudentButton.setVisible(false);
             manageCertificateButton.setVisible(false);
             clearEdtText();
-            edtAddress_Status.setVisible(true);
+//            edtAddress_Status.setVisible(true);
             comboBoxGender.setVisible(false);
             comboStatus_Country.setVisible(false);
             txtGender_Img.setVisible(false);
@@ -346,7 +345,7 @@ public class MainForm extends JFrame {
         edtGender_Img.setText("");
         comboBoxModelStatus_Country.removeAllElements();
         comboBoxModelGender.removeAllElements();
-        edtAddress_Status.setText("");
+//        edtAddress_Status.setText("");
         edtDOB.setText("");
         edtGPA.setText("");
     }
@@ -469,8 +468,7 @@ public class MainForm extends JFrame {
     }
 
     private void addUser(){
-        if(!edtName.getText().toString().isEmpty() || !edtAge.getText().toString().isEmpty() || !edtPhone.getText().isEmpty()
-        || !edtGender_Img.getText().toString().isEmpty()){
+        if(!edtName.getText().toString().isEmpty() || !edtAge.getText().toString().isEmpty() || !edtPhone.getText().isEmpty()){
 
             String name = edtName.getText();
             Integer age = Integer.parseInt(edtAge.getText());
@@ -632,7 +630,6 @@ public class MainForm extends JFrame {
 
     private void addStudent() {
         if(!edtName.getText().toString().isEmpty() || !edtPhone.getText().isEmpty()
-                || !edtGender_Img.getText().toString().isEmpty()
                 || !edtDOB.getText().toString().isEmpty() ||!edtGPA.getText().isEmpty()) {
 
             String name = edtName.getText();
