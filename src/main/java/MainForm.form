@@ -370,7 +370,7 @@
         </constraints>
         <properties/>
         <border type="none">
-          <font/>
+          <font name="Arial" style="1"/>
           <title-color color="-1"/>
         </border>
         <children>
