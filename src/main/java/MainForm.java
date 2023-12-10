@@ -10,9 +10,12 @@ import Model.Users;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
+import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -79,6 +82,11 @@ public class MainForm extends JFrame {
         fillData();
         disabledField();
 
+        TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>();
+        sorter.setModel(showAllUsers());
+        tableData.setRowSorter(sorter);
+
+
         buttonAddUser.addActionListener(e -> {
             if ("Add User".equals(buttonAddUser.getText())){
                 addUser();
@@ -123,20 +131,31 @@ public class MainForm extends JFrame {
             clearEdtText();
         });
 
+
         mangeUsersButton.addActionListener(e -> {
             onChangeManageData("user");
             showAllUsers();
+            sorter.setModel(showAllUsers());
+            tableData.setRowSorter(sorter);
         });
 
         buttonManagerStudent.addActionListener(e -> {
             onChangeManageData("student");
             fillStudentsData();
+            sorter.setModel(fillStudentsData());
+            tableData.setRowSorter(sorter);
         });
 
         buttonLoginHistory.addActionListener(e -> {
             showLoginHistory();
         });
 
+        edtSearch.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                    sorter.setRowFilter(RowFilter.regexFilter(edtSearch.getText()));
+            }
+        });
     }
 
 //    UI Function
@@ -346,7 +365,10 @@ public class MainForm extends JFrame {
                             students.getGPA()
             });
         }
+
         tableData.setModel(defaultTableModel);
+//        tableData.setRowSorter(sorter);
+
         adjustColumnWidth(3,20);
         adjustColumnWidth(4,250);
         adjustColumnWidth(6, 10);
@@ -354,9 +376,9 @@ public class MainForm extends JFrame {
     }
 
     private void addStudent() {
-        if(!edtName.getText().toString().isEmpty() || !edtPhone.getText().isEmpty()
-                || !edtGender_Img.getText().toString().isEmpty() || !edtAddress_Status.getText().toString().isEmpty()
-                || !edtDOB.getText().toString().isEmpty() ||!edtGPA.getText().isEmpty()) {
+        if(!edtName.getText().isEmpty() || !edtPhone.getText().isEmpty()
+                || !edtGender_Img.getText().isEmpty() || !edtAddress_Status.getText().isEmpty()
+                || !edtDOB.getText().isEmpty() ||!edtGPA.getText().isEmpty()) {
 
             String name = edtName.getText();
             String studentListId = "SL001";
