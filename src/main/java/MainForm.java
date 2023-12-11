@@ -59,6 +59,8 @@ public class MainForm extends JFrame {
     private JButton importStudentButton;
     private JButton manageCertificateButton;
     private JButton exportStudentButton;
+    private JComboBox comboStatus_Country;
+    private JComboBox comboBoxGender;
     private SiteDAO siteDAO = new SiteDAO();
     private UsersDAO usersDAO = new UsersDAO();
     private LoginHistoryDAO loginHistoryDAO = new LoginHistoryDAO();
@@ -153,7 +155,7 @@ public class MainForm extends JFrame {
         edtSearch.addKeyListener(new KeyAdapter() {
             @Override
             public void keyReleased(KeyEvent e) {
-                    sorter.setRowFilter(RowFilter.regexFilter(edtSearch.getText()));
+                sorter.setRowFilter(RowFilter.regexFilter(edtSearch.getText()));
             }
         });
 
@@ -271,7 +273,7 @@ public class MainForm extends JFrame {
         });
     }
 
-//    Logic Function
+    //    Logic Function
     private void updateUser(String id){
         String name = edtName.getText();
         Integer age = Integer.parseInt(edtAge.getText());
@@ -291,7 +293,7 @@ public class MainForm extends JFrame {
 
     private void addUser(){
         if(!edtName.getText().toString().isEmpty() || !edtAge.getText().toString().isEmpty() || !edtPhone.getText().isEmpty()
-        || !edtGender_Img.getText().toString().isEmpty() || !edtAddress_Status.getText().toString().isEmpty()){
+                || !edtGender_Img.getText().toString().isEmpty() || !edtAddress_Status.getText().toString().isEmpty()){
 
             String name = edtName.getText();
             Integer age = Integer.parseInt(edtAge.getText());
@@ -379,7 +381,7 @@ public class MainForm extends JFrame {
                             students.getHome_address(),
                             students.getPhone(),
                             students.getGPA()
-            });
+                    });
         }
 
         tableData.setModel(defaultTableModel);
