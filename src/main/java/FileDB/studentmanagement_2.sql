@@ -56,7 +56,7 @@ INSERT INTO `accounts` (`account_id`, `user_id`, `student_list_id`, `user_name`,
 -- Table structure for table `certificate`
 --
 
-CREATE TABLE `certificate` (
+CREATE TABLE `certificates` (
   `certificate_id` INT NOT NULL AUTO_INCREMENT,
   `student_id` char(10) NOT NULL,
   `date_create` date DEFAULT curdate(),
@@ -70,7 +70,7 @@ CREATE TABLE `certificate` (
 -- Dumping data for table `certificate`
 --
 
-INSERT INTO `certificate` (`student_id`, `date_create`, `certificate_name`, `certificate_level`, `expired_date`) VALUES
+INSERT INTO `certificates` (`student_id`, `date_create`, `certificate_name`, `certificate_level`, `expired_date`) VALUES
 ('STU0000001', '2023-12-10', 'IELTS General', '7.0', '2024-03-22'),
 ('STU0000002', '2023-12-10', 'IELTS Academic', '6.5', '2024-05-15'),
 ('STU0000003', '2023-12-10', 'TOEIC', '850', '2024-08-10'),

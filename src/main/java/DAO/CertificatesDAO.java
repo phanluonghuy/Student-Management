@@ -14,8 +14,8 @@ import java.util.List;
 public class CertificatesDAO {
     private DatabaseRepository databaseRepository;
     private static final String GET_CERTIFICATES = "SELECT * FROM certificates WHERE student_id = ?";
-    private static final String DELETE_CERTIFICATE = "DELETE FROM certificates WHERE certificate_id = ?";
-    private static final String ADD_CERTIFICATE = "INSERT INTO `certificates` (`student_id`, `date_create`, `certificate_name`, `certificate_level`, `expired_date`) \n" +
+    private static final String DELETE_CERTIFICATE = "DELETE FROM certificate WHERE certificate_id = ?";
+    private static final String ADD_CERTIFICATE = "INSERT INTO `certificate` (`student_id`, `date_create`, `certificate_name`, `certificate_level`, `expired_date`) \n" +
             "VALUES (?, ?, ?, ?, ?);";
     private static final String UPDATE_CERTIFICATE = "UPDATE `certificates` \n" +
             "SET `certificate_name` = ?, `certificate_level` = ?, `expired_date` = ? \n" +
