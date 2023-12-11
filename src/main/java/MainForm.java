@@ -56,8 +56,6 @@ public class MainForm extends JFrame {
     private JTextField edtID;
     private JTextField edtName;
     private JTextField edtAge;
-    private JComboBox comboBox1;
-    private JComboBox comboBox2;
     private JTextField edtSearch;
     private JLabel txtAge;
     private JLabel txtPhone;
@@ -80,6 +78,8 @@ public class MainForm extends JFrame {
     private JComboBox comboStatus_Country;
     private JComboBox comboBoxGender;
     private JTextField edtGender_Img;
+    private JLabel imgViewUser;
+    private JTextField edtAddress_Status;
     //    private JTextField edtAddress_Status;
     private SiteDAO siteDAO = new SiteDAO();
     private UsersDAO usersDAO = new UsersDAO();
@@ -102,12 +102,12 @@ public class MainForm extends JFrame {
         onChangeManageData("user");
         showAllUsers();
         fillData();
+        fillUsersStatusData("0");
         disabledField();
 
         TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>();
         sorter.setModel(showAllUsers());
         tableData.setRowSorter(sorter);
-
 
         buttonAddUser.addActionListener(e -> {
             if ("Add User".equals(buttonAddUser.getText())){
@@ -130,18 +130,6 @@ public class MainForm extends JFrame {
                 }else{
                     JOptionPane.showMessageDialog(this, "There is no data to delete", "Warning", JOptionPane.WARNING_MESSAGE);
                 }
-            } else if ("Delete Student".equals(buttonDeleteUser.getText())) {
-                int selectRow = tableData.getSelectedRow();
-                if(selectRow != - 1) {
-                    int resp = JOptionPane.showConfirmDialog(this, "Are you sure to delete "+tableData.getValueAt(selectRow, 0).toString(), "Delete Confirmation", JOptionPane.YES_NO_OPTION);
-                    if (resp == JOptionPane.YES_NO_OPTION){
-                        deleteStudent(tableData.getValueAt(selectRow, 0).toString());
-                    }else{
-                        JOptionPane.showMessageDialog(this, "Delete Canceled", "Notice", JOptionPane.INFORMATION_MESSAGE);
-                    }
-                }else {
-                    JOptionPane.showMessageDialog(this, "There is no data to delete", "Warning", JOptionPane.WARNING_MESSAGE);
-                }
             }
         });
 
@@ -152,16 +140,6 @@ public class MainForm extends JFrame {
                     int resp = JOptionPane.showConfirmDialog(this, "Are you sure to update "+ tableData.getValueAt(selectRow, 0).toString(), "Update Confirmation", JOptionPane.YES_NO_OPTION);
                     if(resp == JOptionPane.YES_NO_OPTION){
                         updateUser(tableData.getValueAt(selectRow, 0).toString());
-                    }else {
-                        JOptionPane.showMessageDialog(this, "Update Canceled", "Notice", JOptionPane.INFORMATION_MESSAGE);
-                    }
-                }
-            } else if ("Update Student".equals(buttonUpdateUser.getText())) {
-                int selectRow = tableData.getSelectedRow();
-                if(selectRow != -1){
-                    int resp = JOptionPane.showConfirmDialog(this, "Are you sure to update "+ tableData.getValueAt(selectRow, 0).toString(), "Update Confirmation", JOptionPane.YES_NO_OPTION);
-                    if(resp == JOptionPane.YES_NO_OPTION){
-                        updateStudent(tableData.getValueAt(selectRow, 0).toString());
                     }else {
                         JOptionPane.showMessageDialog(this, "Update Canceled", "Notice", JOptionPane.INFORMATION_MESSAGE);
                     }
@@ -178,6 +156,7 @@ public class MainForm extends JFrame {
             showAllUsers();
             sorter.setModel(showAllUsers());
             tableData.setRowSorter(sorter);
+            fillUsersStatusData("0");
         });
 
         buttonManagerStudent.addActionListener(e -> {
@@ -185,11 +164,15 @@ public class MainForm extends JFrame {
             fillStudentsData();
             sorter.setModel(fillStudentsData());
             tableData.setRowSorter(sorter);
+            fillDataGender("0");
+            fillDataCountry("0");
         });
 
         buttonLoginHistory.addActionListener(e -> {
             onChangeManageData("login");
             showLoginHistory();
+            sorter.setModel(showLoginHistory());
+            tableData.setRowSorter(sorter);
         });
 
         exportStudentButton.addActionListener(e -> {
@@ -214,6 +197,16 @@ public class MainForm extends JFrame {
                 sorter.setRowFilter(RowFilter.regexFilter(edtSearch.getText()));
             }
         });
+        manageCertificateButton.addActionListener(e -> {
+            String studentID = edtID.getText();
+            if (studentID.isEmpty()) {
+                JOptionPane.showMessageDialog(panelMain,"No student selected!");
+                return;
+            }
+            System.out.println(studentID);
+            CertificateFrom certificate = new CertificateFrom(studentID);
+        });
+
 
     }
 
@@ -265,7 +258,7 @@ public class MainForm extends JFrame {
                 edtName.setText(tableData.getValueAt(selectRow, 1).toString());
                 edtAge.setText(tableData.getValueAt(selectRow, 2).toString());
                 edtPhone.setText(tableData.getValueAt(selectRow, 3).toString());
-//                edtAddress_Status.setText(tableData.getValueAt(selectRow, 4).toString());
+                edtAddress_Status.setText(tableData.getValueAt(selectRow, 4).toString());
                 edtAge.setEnabled(true);
             }
         }
@@ -286,7 +279,7 @@ public class MainForm extends JFrame {
             comboBoxGender.setVisible(false);
             txtGender_Img.setVisible(false);
             edtGender_Img.setVisible(false);
-//            edtAddress_Status.setVisible(false);
+            edtAddress_Status.setVisible(false);
             txtDOB.setVisible(false);
             edtDOB.setVisible(false);
             txtGPA.setVisible(false);
@@ -305,7 +298,7 @@ public class MainForm extends JFrame {
             clearEdtText();
             comboStatus_Country.setVisible(true);
             comboBoxGender.setVisible(true);
-//            edtAddress_Status.setVisible(false);
+            edtAddress_Status.setVisible(false);
 //            fillDataDateTime();
             txtGender_Img.setVisible(true);
             edtGender_Img.setVisible(false);
@@ -323,7 +316,7 @@ public class MainForm extends JFrame {
             exportStudentButton.setVisible(false);
             manageCertificateButton.setVisible(false);
             clearEdtText();
-//            edtAddress_Status.setVisible(true);
+            edtAddress_Status.setVisible(true);
             comboBoxGender.setVisible(false);
             comboStatus_Country.setVisible(false);
             txtGender_Img.setVisible(false);
@@ -345,7 +338,7 @@ public class MainForm extends JFrame {
         edtGender_Img.setText("");
         comboBoxModelStatus_Country.removeAllElements();
         comboBoxModelGender.removeAllElements();
-//        edtAddress_Status.setText("");
+        edtAddress_Status.setText("");
         edtDOB.setText("");
         edtGPA.setText("");
     }
@@ -490,13 +483,18 @@ public class MainForm extends JFrame {
 
     private void fillUsersStatusData(String id){
         DefaultComboBoxModel<String> comboBoxModel = new DefaultComboBoxModel();
-        String status = usersDAO.getUsersStatus(id);
-        if (status.equals("Normal")){
-            comboBoxModel.addElement(status);
-            comboBoxModel.addElement("Locked");
+        if (!id.equals("0")){
+            String status = usersDAO.getUsersStatus(id);
+            if (status.equals("Normal")){
+                comboBoxModel.addElement(status);
+                comboBoxModel.addElement("Locked");
+            }else{
+                comboBoxModel.addElement(status);
+                comboBoxModel.addElement("Normal");
+            }
         }else{
-            comboBoxModel.addElement(status);
             comboBoxModel.addElement("Normal");
+            comboBoxModel.addElement("Locked");
         }
         comboStatus_Country.setModel(comboBoxModel);
     }
@@ -527,7 +525,7 @@ public class MainForm extends JFrame {
     }
 //    <!-- --!>
 
-    private void showLoginHistory(){
+    private DefaultTableModel showLoginHistory(){
         DefaultTableModel tableModelHistory = new DefaultTableModel();
         tableModelHistory.addColumn("History ID");
         tableModelHistory.addColumn("User Name");
@@ -547,19 +545,25 @@ public class MainForm extends JFrame {
                     loginHistoryDAO.getRoleByAccId(role_id), history.getDate_perform()});
         }
         tableData.setModel(tableModelHistory);
+        return tableModelHistory;
     }
 
     //Students Part
 
     private void fillDataGender(String id){
         DefaultComboBoxModel<String> comboBoxModel = new DefaultComboBoxModel();
-        String gender = studentsDAO.getStudentById(id).getGender();
-        if (gender.equals("Male")){
-            comboBoxModel.addElement("Male");
-            comboBoxModel.addElement("Female");
+        if (!id.equals("0")){
+            String gender = studentsDAO.getStudentById(id).getGender();
+            if (gender.equals("Male")){
+                comboBoxModel.addElement("Male");
+                comboBoxModel.addElement("Female");
+            }else{
+                comboBoxModel.addElement("Female");
+                comboBoxModel.addElement("Male");
+            }
         }else{
-            comboBoxModel.addElement("Female");
             comboBoxModel.addElement("Male");
+            comboBoxModel.addElement("Female");
         }
         comboBoxGender.setModel(comboBoxModel);
     }
@@ -577,11 +581,14 @@ public class MainForm extends JFrame {
                 Response response = okHttpClient.newCall(request).execute();
                 String responseData = response.body().string();
                 JSONArray data = new JSONArray(responseData);
-                String country = studentsDAO.getStudentById(id).getHome_address();
-                comboBoxModel.addElement(country);
+                String country = "";
+                if(!id.equals("0")){
+                    country = studentsDAO.getStudentById(id).getHome_address();
+                    comboBoxModel.addElement(country);
+                }
                 for (int i = 0; i < data.length(); i++) {
                     String name = data.getJSONObject(i).getString("name");
-                    if (country.equals(name)){
+                    if (country.equals(name) && !id.equals("0")){
                         continue;
                     }else {
                         comboBoxModel.addElement(name);
