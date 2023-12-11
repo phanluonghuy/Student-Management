@@ -11,6 +11,8 @@ import java.util.List;
 
 public class UsersDAO {
     private DatabaseRepository databaseRepository;
+    private static final String GET_USERS_STATUS = "SELECT * FROM users WHERE user_id = ?";
+
     private static final String ADD_USERS = "INSERT INTO users values (?, ?, ?, ?, ?, ?)";
     private static final String DELETE_USERS = "DELETE FROM users WHERE user_id = ?";
     private static final String UPDATE_USERS = "UPDATE users SET full_name = ?, age = ?, phone_number = ?, image_profile = ?, status_user = ? WHERE user_id = ?";
@@ -89,5 +91,44 @@ public class UsersDAO {
         } catch (SQLException e) {
             throw new RuntimeException("Error updating users", e);
         }
+    }
+
+    public String getUsersStatus(String id){
+        Users users = new Users();
+        try (Connection conn = getConnection()) {
+            PreparedStatement statement = conn.prepareStatement(GET_USERS_STATUS);
+            statement.setString(1, id);
+
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()){
+                String status = resultSet.getString("status_user");
+                users.setIsActive(status);
+            }
+            closeConnection(conn);
+        } catch (SQLException e) {
+            throw new RuntimeException("Error getting users status", e);
+        }
+        return users.getIsActive();
+    }
+
+    public Users getUsersById(String id){
+        Users users = null;
+        try (Connection conn = getConnection()) {
+            PreparedStatement statement = conn.prepareStatement(GET_USERS_STATUS);
+            statement.setString(1, id);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()){
+                String name = resultSet.getString("full_name");
+                int age = resultSet.getInt("age");
+                String phone = resultSet.getString("phone_number");
+                String img = resultSet.getString("image_profile");
+                String status = resultSet.getString("status_user");
+                users = new Users(id, name, age, phone, img, status);
+            }
+            closeConnection(conn);
+        } catch (SQLException e) {
+            throw new RuntimeException("Error adding users", e);
+        }
+        return users;
     }
 }

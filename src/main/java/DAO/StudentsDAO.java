@@ -12,6 +12,7 @@ import java.util.Date;
 import java.util.List;
 
 public class StudentsDAO {
+    private static final String GET_STUDENTS_BY_ID = "SELECT * FROM students WHERE student_id = ?";
     private static final String ADD_STUDENTS = "INSERT INTO students VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
     private static final String UPDATES_TOTAL = "UPDATE studentlist SET total= ? WHERE student_list_id= ?";
     private static final String DELETE_STUDENTS = "DELETE FROM students WHERE student_id = ?";
@@ -145,5 +146,28 @@ public class StudentsDAO {
         } catch (SQLException e) {
             throw new RuntimeException("Error updating Student", e);
         }
+    }
+
+    public Students getStudentById(String id){
+        Students students = null;
+        try (Connection conn = getConnection()) {
+            PreparedStatement statement = conn.prepareStatement(GET_STUDENTS_BY_ID);
+            statement.setString(1, id);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()){
+                String student_list_id = resultSet.getString("student_list_id");
+                String fullName = resultSet.getString("full_name");
+                Date birthDay = resultSet.getDate("birthDay");
+                String gender = resultSet.getString("gender");
+                String home_address = resultSet.getString("home_address");
+                String phone = resultSet.getString("phone_number");
+                float gpa = resultSet.getFloat("gpa");
+                students = new Students(id, student_list_id, fullName, birthDay, gender, home_address, phone, gpa);
+            }
+            closeConnection(conn);
+        } catch (SQLException e) {
+            throw new RuntimeException("Error adding users", e);
+        }
+        return students;
     }
 }

@@ -26,6 +26,10 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -52,8 +56,6 @@ public class MainForm extends JFrame {
     private JTextField edtID;
     private JTextField edtName;
     private JTextField edtAge;
-    private JComboBox comboBox1;
-    private JComboBox comboBox2;
     private JTextField edtSearch;
     private JLabel txtAge;
     private JLabel txtPhone;
@@ -97,6 +99,7 @@ public class MainForm extends JFrame {
         onChangeManageData("user");
         showAllUsers();
         fillData();
+        fillUsersStatusData("0");
         disabledField();
 
         TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>();
@@ -174,6 +177,7 @@ public class MainForm extends JFrame {
             showAllUsers();
             sorter.setModel(showAllUsers());
             tableData.setRowSorter(sorter);
+            fillUsersStatusData("0");
         });
 
         buttonManagerStudent.addActionListener(e -> {
@@ -181,11 +185,15 @@ public class MainForm extends JFrame {
             fillStudentsData();
             sorter.setModel(fillStudentsData());
             tableData.setRowSorter(sorter);
+            fillDataCountry("0");
+            fillDataGender("0");
         });
 
         buttonLoginHistory.addActionListener(e -> {
             onChangeManageData("login");
             showLoginHistory();
+            sorter.setModel(showLoginHistory());
+            tableData.setRowSorter(sorter);
         });
 
         edtSearch.addKeyListener(new KeyAdapter() {
@@ -232,7 +240,6 @@ public class MainForm extends JFrame {
         });
     }
 
-
     private void fillEditText(int selectRow){
         if ("Add User".equals(buttonAddUser.getText()) && txtAge.getText().equals("Age")) {
             if (selectRow >= 0 && selectRow < tableData.getModel().getRowCount()){
@@ -276,6 +283,8 @@ public class MainForm extends JFrame {
             buttonDeleteUser.setText("Delete User");
             txtGender_Img.setText("Image Profile");
             txtAddress_Status.setText("Status");
+            txtAge.setText("Age");
+            txtPhone.setText("Phone number");
             importStudentButton.setVisible(false);
             exportStudentButton.setVisible(false);
             manageCertificateButton.setVisible(false);
@@ -489,13 +498,18 @@ public class MainForm extends JFrame {
 
     private void fillUsersStatusData(String id){
         DefaultComboBoxModel<String> comboBoxModel = new DefaultComboBoxModel();
-        String status = usersDAO.getUsersStatus(id);
-        if (status.equals("Normal")){
-            comboBoxModel.addElement(status);
-            comboBoxModel.addElement("Locked");
+        if (!id.equals("0")){
+            String status = usersDAO.getUsersStatus(id);
+            if (status.equals("Normal")){
+                comboBoxModel.addElement("Normal");
+                comboBoxModel.addElement("Locked");
+            }else{
+                comboBoxModel.addElement("Locked");
+                comboBoxModel.addElement("Normal");
+            }
         }else{
-            comboBoxModel.addElement(status);
             comboBoxModel.addElement("Normal");
+            comboBoxModel.addElement("Locked");
         }
         comboStatus_Country.setModel(comboBoxModel);
     }
@@ -526,7 +540,7 @@ public class MainForm extends JFrame {
     }
 //    <!-- --!>
 
-    private void showLoginHistory(){
+    private DefaultTableModel showLoginHistory(){
         DefaultTableModel tableModelHistory = new DefaultTableModel();
         tableModelHistory.addColumn("History ID");
         tableModelHistory.addColumn("User Name");
@@ -545,19 +559,25 @@ public class MainForm extends JFrame {
                     loginHistoryDAO.getRoleByAccId(role_id), history.getDate_perform()});
         }
         tableData.setModel(tableModelHistory);
+        return tableModelHistory;
     }
 
     //Students Part
 
     private void fillDataGender(String id){
         DefaultComboBoxModel<String> comboBoxModel = new DefaultComboBoxModel();
-        String gender = studentsDAO.getStudentById(id).getGender();
-        if (gender.equals("Male")){
-            comboBoxModel.addElement("Male");
-            comboBoxModel.addElement("Female");
+        if (!id.equals("0")){
+            String gender = studentsDAO.getStudentById(id).getGender();
+            if (gender.equals("Male")){
+                comboBoxModel.addElement("Male");
+                comboBoxModel.addElement("Female");
+            }else{
+                comboBoxModel.addElement("Female");
+                comboBoxModel.addElement("Male");
+            }
         }else{
-            comboBoxModel.addElement("Female");
             comboBoxModel.addElement("Male");
+            comboBoxModel.addElement("Female");
         }
         comboBoxGender.setModel(comboBoxModel);
     }
@@ -575,11 +595,14 @@ public class MainForm extends JFrame {
                 Response response = okHttpClient.newCall(request).execute();
                 String responseData = response.body().string();
                 JSONArray data = new JSONArray(responseData);
-                String country = studentsDAO.getStudentById(id).getHome_address();
-                comboBoxModel.addElement(country);
+                String country = "";
+                if (!id.equals("0")){
+                    country = studentsDAO.getStudentById(id).getHome_address();
+                    comboBoxModel.addElement(country);
+                }
                 for (int i = 0; i < data.length(); i++) {
                     String name = data.getJSONObject(i).getString("name");
-                    if (country.equals(name)){
+                    if (country.equals(name) && !id.equals("0")){
                         continue;
                     }else {
                         comboBoxModel.addElement(name);
