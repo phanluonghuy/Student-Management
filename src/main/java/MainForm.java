@@ -14,22 +14,25 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.json.JSONArray;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.json.JSONArray;
+
 import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -44,6 +47,7 @@ import java.util.concurrent.Executors;
 public class MainForm extends JFrame {
     private JPanel panelMain;
     private JButton buttonLogout;
+    private JButton buttonReports;
     private JButton buttonLoginHistory;
     private JButton buttonManagerStudent;
     private JButton buttonDeleteUser;
@@ -56,6 +60,8 @@ public class MainForm extends JFrame {
     private JTextField edtID;
     private JTextField edtName;
     private JTextField edtAge;
+    private JComboBox comboBox1;
+    private JComboBox comboBox2;
     private JTextField edtSearch;
     private JLabel txtAge;
     private JLabel txtPhone;
@@ -63,6 +69,8 @@ public class MainForm extends JFrame {
     private JLabel txtName;
     private JTextField edtPhone;
     private JTextField edtGender_Img;
+//    private JTextField edtAddress_Status;
+//    private JTextField edtGender_Img;
 //    private JTextField edtAddress_Status;
     private JTextField edtDOB;
     private JTextField edtGPA;
@@ -99,7 +107,6 @@ public class MainForm extends JFrame {
         onChangeManageData("user");
         showAllUsers();
         fillData();
-        fillUsersStatusData("0");
         disabledField();
 
         TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>();
@@ -118,25 +125,15 @@ public class MainForm extends JFrame {
         buttonDeleteUser.addActionListener(e -> {
             if ("Delete User".equals(buttonDeleteUser.getText())){
                 int selectRow = tableData.getSelectedRow();
-                if(selectRow != - 1) {
-                    int resp = JOptionPane.showConfirmDialog(this, "Are you sure to delete "+tableData.getValueAt(selectRow, 0).toString(), "Delete Confirmation", JOptionPane.YES_NO_OPTION);
-                    if (resp == JOptionPane.YES_NO_OPTION){
-                        deleteUser(tableData.getValueAt(selectRow, 0).toString());
-                    }else{
-                        JOptionPane.showMessageDialog(this, "Delete Canceled", "Notice", JOptionPane.INFORMATION_MESSAGE);
-                    }
+                if (selectRow != -1){
+                    deleteUser(tableData.getValueAt(selectRow, 0).toString());
                 }else{
                     JOptionPane.showMessageDialog(this, "There is no data to delete", "Warning", JOptionPane.WARNING_MESSAGE);
                 }
             } else if ("Delete Student".equals(buttonDeleteUser.getText())) {
                 int selectRow = tableData.getSelectedRow();
                 if(selectRow != - 1) {
-                    int resp = JOptionPane.showConfirmDialog(this, "Are you sure to delete "+tableData.getValueAt(selectRow, 0).toString(), "Delete Confirmation", JOptionPane.YES_NO_OPTION);
-                    if (resp == JOptionPane.YES_NO_OPTION){
-                        deleteStudent(tableData.getValueAt(selectRow, 0).toString());
-                    }else{
-                        JOptionPane.showMessageDialog(this, "Delete Canceled", "Notice", JOptionPane.INFORMATION_MESSAGE);
-                    }
+                    deleteStudent(tableData.getValueAt(selectRow, 0).toString());
                 }else {
                     JOptionPane.showMessageDialog(this, "There is no data to delete", "Warning", JOptionPane.WARNING_MESSAGE);
                 }
@@ -147,22 +144,12 @@ public class MainForm extends JFrame {
             if ("Update User".equals(buttonUpdateUser.getText())){
                 int selectRow = tableData.getSelectedRow();
                 if(selectRow != -1){
-                    int resp = JOptionPane.showConfirmDialog(this, "Are you sure to update "+ tableData.getValueAt(selectRow, 0).toString(), "Update Confirmation", JOptionPane.YES_NO_OPTION);
-                    if(resp == JOptionPane.YES_NO_OPTION){
-                        updateUser(tableData.getValueAt(selectRow, 0).toString());
-                    }else {
-                        JOptionPane.showMessageDialog(this, "Update Canceled", "Notice", JOptionPane.INFORMATION_MESSAGE);
-                    }
+                    updateUser(tableData.getValueAt(selectRow, 0).toString());
                 }
             } else if ("Update Student".equals(buttonUpdateUser.getText())) {
                 int selectRow = tableData.getSelectedRow();
-                if(selectRow != -1){
-                    int resp = JOptionPane.showConfirmDialog(this, "Are you sure to update "+ tableData.getValueAt(selectRow, 0).toString(), "Update Confirmation", JOptionPane.YES_NO_OPTION);
-                    if(resp == JOptionPane.YES_NO_OPTION){
-                        updateStudent(tableData.getValueAt(selectRow, 0).toString());
-                    }else {
-                        JOptionPane.showMessageDialog(this, "Update Canceled", "Notice", JOptionPane.INFORMATION_MESSAGE);
-                    }
+                if(selectRow != -1) {
+                    updateStudent(tableData.getValueAt(selectRow, 0).toString());
                 }
             }
         });
@@ -177,7 +164,6 @@ public class MainForm extends JFrame {
             showAllUsers();
             sorter.setModel(showAllUsers());
             tableData.setRowSorter(sorter);
-            fillUsersStatusData("0");
         });
 
         buttonManagerStudent.addActionListener(e -> {
@@ -185,21 +171,16 @@ public class MainForm extends JFrame {
             fillStudentsData();
             sorter.setModel(fillStudentsData());
             tableData.setRowSorter(sorter);
-            fillDataCountry("0");
-            fillDataGender("0");
         });
 
         buttonLoginHistory.addActionListener(e -> {
-            onChangeManageData("login");
             showLoginHistory();
-            sorter.setModel(showLoginHistory());
-            tableData.setRowSorter(sorter);
         });
 
         edtSearch.addKeyListener(new KeyAdapter() {
             @Override
             public void keyReleased(KeyEvent e) {
-                sorter.setRowFilter(RowFilter.regexFilter(edtSearch.getText()));
+                    sorter.setRowFilter(RowFilter.regexFilter(edtSearch.getText()));
             }
         });
 
@@ -218,6 +199,7 @@ public class MainForm extends JFrame {
                 dispose();
             }
         });
+
 
     }
 
@@ -239,6 +221,7 @@ public class MainForm extends JFrame {
             }
         });
     }
+
 
     private void fillEditText(int selectRow){
         if ("Add User".equals(buttonAddUser.getText()) && txtAge.getText().equals("Age")) {

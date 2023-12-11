@@ -21,6 +21,11 @@ SET time_zone = "+00:00";
 -- Database: `studentmanagement`
 --
 
+--
+-- Database: `studentmanagement`
+--
+CREATE DATABASE IF NOT EXISTS `studentmanagement` DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+USE `studentmanagement`;
 -- --------------------------------------------------------
 
 --
@@ -48,34 +53,35 @@ INSERT INTO `accounts` (`account_id`, `user_id`, `student_list_id`, `user_name`,
 -- --------------------------------------------------------
 
 --
--- Table structure for table `certificates`
+-- Table structure for table `certificate`
 --
 
-CREATE TABLE `certificates` (
-  `certificate_id` varchar(10) DEFAULT NULL,
+CREATE TABLE `certificate` (
+  `certificate_id` INT NOT NULL AUTO_INCREMENT,
   `student_id` char(10) NOT NULL,
   `date_create` date DEFAULT curdate(),
   `certificate_name` varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
   `certificate_level` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
-  `expired_date` date DEFAULT NULL
+  `expired_date` date DEFAULT NULL,
+  PRIMARY KEY (`certificate_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
--- Dumping data for table `certificates`
+-- Dumping data for table `certificate`
 --
 
-INSERT INTO `certificates` (`certificate_id`, `student_id`, `date_create`, `certificate_name`, `certificate_level`, `expired_date`) VALUES
-('CER0000001', 'STU0000001', '2023-12-10', 'IELTS General', '7.0', '2024-03-22'),
-('CER0000002', 'STU0000002', '2023-12-10', 'IELTS Academic', '6.5', '2024-05-15'),
-('CER0000003', 'STU0000003', '2023-12-10', 'TOEIC', '850', '2024-08-10'),
-('CER0000004', 'STU0000004', '2023-12-10', 'IELTS General', '7.5', '2023-11-28'),
-('CER0000005', 'STU0000005', '2023-12-10', 'TOEIC', '950', '2024-09-30'),
-('CER0000006', 'STU0000006', '2023-12-10', 'IELTS Academic', '7.0', '2023-06-12'),
-('CER0000007', 'STU0000007', '2023-12-10', 'TOEIC', '900', '2024-12-05'),
-('CER0000008', 'STU0000008', '2023-12-10', 'IELTS General', '6.0', '2023-09-18'),
-('CER0000009', 'STU0000009', '2023-12-10', 'TOEIC', '800', '2024-07-22'),
-('CER0000010', 'STU0000010', '2023-12-10', 'IELTS Academic', '7.5', '2023-04-02'),
-('CER0000011', 'STU0000010', '2023-12-10', 'TOEIC', '870', '2024-11-15');
+INSERT INTO `certificate` (`student_id`, `date_create`, `certificate_name`, `certificate_level`, `expired_date`) VALUES
+('STU0000001', '2023-12-10', 'IELTS General', '7.0', '2024-03-22'),
+('STU0000002', '2023-12-10', 'IELTS Academic', '6.5', '2024-05-15'),
+('STU0000003', '2023-12-10', 'TOEIC', '850', '2024-08-10'),
+('STU0000004', '2023-12-10', 'IELTS General', '7.5', '2023-11-28'),
+('STU0000005', '2023-12-10', 'TOEIC', '950', '2024-09-30'),
+('STU0000006', '2023-12-10', 'IELTS Academic', '7.0', '2023-06-12'),
+('STU0000007', '2023-12-10', 'TOEIC', '900', '2024-12-05'),
+('STU0000008', '2023-12-10', 'IELTS General', '6.0', '2023-09-18'),
+('STU0000009', '2023-12-10', 'TOEIC', '800', '2024-07-22'),
+('STU0000010', '2023-12-10', 'IELTS Academic', '7.5', '2023-04-02'),
+('STU0000010', '2023-12-10', 'TOEIC', '870', '2024-11-15');
 
 -- --------------------------------------------------------
 
@@ -210,9 +216,9 @@ ALTER TABLE `accounts`
   ADD KEY `FK_Account_Role` (`role_id`);
 
 --
--- Indexes for table `certificates`
+-- Indexes for table `certificate`
 --
-ALTER TABLE `certificates`
+ALTER TABLE `certificate`
   ADD KEY `FK_Certificate_Student` (`student_id`),
   ADD KEY `FK_Certificate_Classificate` (`certificate_id`);
 
@@ -261,9 +267,9 @@ ALTER TABLE `accounts`
   ADD CONSTRAINT `accounts_ibfk_1` FOREIGN KEY (`student_list_id`) REFERENCES `studentlist` (`student_list_id`);
 
 --
--- Constraints for table `certificates`
+-- Constraints for table `certificate`
 --
-ALTER TABLE `certificates`
+ALTER TABLE `certificate`
   ADD CONSTRAINT `FK_Certificate_Student` FOREIGN KEY (`student_id`) REFERENCES `students` (`student_id`);
 
 --
