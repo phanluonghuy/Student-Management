@@ -20,8 +20,6 @@ public class StudentsDAO {
     private DatabaseRepository databaseRepository;
     private static final String GET_STUDENTS = "SELECT * FROM students";
 
-    private static final String GET_STUDENTS_BY_ID = "SELECT * FROM students WHERE student_id = ?";
-
     public StudentsDAO() {
         this.databaseRepository = new DatabaseRepository();
     }

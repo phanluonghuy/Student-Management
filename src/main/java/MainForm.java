@@ -25,6 +25,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.json.JSONArray;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
@@ -33,6 +34,10 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -108,6 +113,7 @@ public class MainForm extends JFrame {
         showAllUsers();
         fillData();
         disabledField();
+        fillUsersStatusData("0");
 
         TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>();
         sorter.setModel(showAllUsers());
@@ -164,17 +170,24 @@ public class MainForm extends JFrame {
             showAllUsers();
             sorter.setModel(showAllUsers());
             tableData.setRowSorter(sorter);
+            fillUsersStatusData("0");
         });
 
         buttonManagerStudent.addActionListener(e -> {
             onChangeManageData("student");
             fillStudentsData();
+            fillDataCountry("0");
+            fillDataGender("0");
             sorter.setModel(fillStudentsData());
             tableData.setRowSorter(sorter);
         });
 
         buttonLoginHistory.addActionListener(e -> {
+            onChangeManageData("login");
             showLoginHistory();
+            sorter.setModel(showLoginHistory());
+            tableData.setRowSorter(sorter);
+
         });
 
         edtSearch.addKeyListener(new KeyAdapter() {
