@@ -1,11 +1,7 @@
-import DAO.DatabaseRepository;
 import DAO.SiteDAO;
-import com.sun.nio.sctp.Notification;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.HashMap;
 
 public class LoginForm extends JFrame{
@@ -37,9 +33,5 @@ public class LoginForm extends JFrame{
             }
 //                System.out.println(user.get("user_name"));
         });
-    }
-
-    private void createUIComponents() {
-        // TODO: place custom component creation code here
     }
 }

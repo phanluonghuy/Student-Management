@@ -12,14 +12,13 @@ import java.util.Date;
 import java.util.List;
 
 public class StudentsDAO {
+    private static final String GET_STUDENTS_BY_ID = "SELECT * FROM students WHERE student_id = ?";
     private static final String ADD_STUDENTS = "INSERT INTO students VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
     private static final String UPDATES_TOTAL = "UPDATE studentlist SET total= ? WHERE student_list_id= ?";
     private static final String DELETE_STUDENTS = "DELETE FROM students WHERE student_id = ?";
     private static final String UPDATE_STUDENTS = "UPDATE students SET full_name= ?, birthday= ?, gender = ?, home_address= ?, phone_number = ?, gpa= ? WHERE student_id = ?";
     private DatabaseRepository databaseRepository;
     private static final String GET_STUDENTS = "SELECT * FROM students";
-
-    private static final String GET_STUDENTS_BY_ID = "SELECT * FROM students WHERE student_id = ?";
 
     public StudentsDAO() {
         this.databaseRepository = new DatabaseRepository();
