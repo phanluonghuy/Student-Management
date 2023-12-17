@@ -1,12 +1,15 @@
 package DAO;
 
 import Model.Certificate;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 
 import javax.swing.*;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -14,8 +17,10 @@ import java.util.List;
 public class CertificatesDAO {
     private DatabaseRepository databaseRepository;
     private static final String GET_CERTIFICATES = "SELECT * FROM certificates WHERE student_id = ?";
-    private static final String DELETE_CERTIFICATE = "DELETE FROM certificate WHERE certificate_id = ?";
-    private static final String ADD_CERTIFICATE = "INSERT INTO `certificate` (`student_id`, `date_create`, `certificate_name`, `certificate_level`, `expired_date`) \n" +
+    private static final String GET_ALL_CERTIFICATES = "SELECT * FROM certificates";
+
+    private static final String DELETE_CERTIFICATE = "DELETE FROM certificates WHERE certificate_id = ?";
+    private static final String ADD_CERTIFICATE = "INSERT INTO `certificates` (`student_id`, `date_create`, `certificate_name`, `certificate_level`, `expired_date`) \n" +
             "VALUES (?, ?, ?, ?, ?);";
     private static final String UPDATE_CERTIFICATE = "UPDATE `certificates` \n" +
             "SET `certificate_name` = ?, `certificate_level` = ?, `expired_date` = ? \n" +
@@ -118,6 +123,35 @@ public class CertificatesDAO {
         } catch (SQLException e){
             e.printStackTrace();
             return false;
+        }
+    }
+
+    public void exportCertificateToXls(Sheet sheet){
+
+        try (Connection connection = getConnection()) {
+            PreparedStatement preparedStatement = connection.prepareStatement(GET_ALL_CERTIFICATES);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            int row = 1;
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            while (resultSet.next()) {
+                Row dataRow = sheet.createRow(row++);
+                String certificate_id = resultSet.getString("certificate_id");
+                dataRow.createCell(0).setCellValue(certificate_id);
+                String student_id = resultSet.getString("student_id");
+                dataRow.createCell(1).setCellValue(student_id);
+                Timestamp date_created = resultSet.getTimestamp("date_create");
+                dataRow.createCell(2).setCellValue(dateFormat.format(date_created));
+                String certificate_name = resultSet.getString("certificate_name");
+                dataRow.createCell(3).setCellValue(certificate_name);
+                String certificate_level = resultSet.getString("certificate_level");
+                dataRow.createCell(4).setCellValue(certificate_level);
+                Timestamp expired_date = resultSet.getTimestamp("expired_date");
+                dataRow.createCell(5).setCellValue(dateFormat.format(expired_date));
+            }
+            CloseConnection(connection);
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 }

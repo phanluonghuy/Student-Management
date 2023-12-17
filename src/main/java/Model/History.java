@@ -2,6 +2,7 @@ package Model;
 
 import lombok.*;
 
+import java.sql.Timestamp;
 import java.util.Date;
 
 @NoArgsConstructor
@@ -12,6 +13,6 @@ import java.util.Date;
 public class History {
     private String history_id;
     private String account_id;
-    private Date date_perform;
+    private Timestamp date_perform;
 
 }

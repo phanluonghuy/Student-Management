@@ -1,13 +1,22 @@
 import DAO.CertificatesDAO;
 import Model.Certificate;
+import Model.Students;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 public class CertificateFrom extends JFrame {
@@ -28,7 +37,7 @@ public class CertificateFrom extends JFrame {
     private List<Certificate> certificateList;
     private String studentID;
 
-    public CertificateFrom(String studentID) {
+    public CertificateFrom(String studentID, String role_name) {
         setContentPane(panelMain);
         setTitle("Certificate");
         setSize(700, 400);
@@ -38,6 +47,7 @@ public class CertificateFrom extends JFrame {
         tableCer.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         this.studentID = studentID;
         loadData();
+        checkRoleEmployee(role_name);
         tableCer.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
@@ -105,7 +115,16 @@ public class CertificateFrom extends JFrame {
 
     }
 
-    private void loadData() {
+    private void checkRoleEmployee(String role_name){
+        if (role_name.equals("Employee")){
+            addButton.setVisible(false);
+            deleteButton.setVisible(false);
+            saveButton.setVisible(false);
+            clearButton.setVisible(false);
+        }
+    }
+
+    private DefaultTableModel loadData() {
         try {
             certificateList =  certificatesDAO.getCertificates(studentID);
         } catch (SQLException e){
@@ -122,5 +141,6 @@ public class CertificateFrom extends JFrame {
             tableModel.addRow(new Object[]{c.getCertificate_id(),c.getCertificate_name(),c.getCertificate_level(),c.getDate_created(),c.getExpired_date() });
         }
         tableCer.setModel(tableModel);
+        return tableModel;
     }
 }

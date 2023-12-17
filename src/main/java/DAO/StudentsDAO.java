@@ -13,6 +13,8 @@ import java.util.List;
 
 public class StudentsDAO {
     private static final String GET_STUDENTS_BY_ID = "SELECT * FROM students WHERE student_id = ?";
+    private static final String DELETE_CERTIFICATES_BY_STUDENT_ID = "DELETE FROM certificates WHERE student_id = ?";
+
     private static final String ADD_STUDENTS = "INSERT INTO students VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
     private static final String UPDATES_TOTAL = "UPDATE studentlist SET total= ? WHERE student_list_id= ?";
     private static final String DELETE_STUDENTS = "DELETE FROM students WHERE student_id = ?";
@@ -108,7 +110,8 @@ public class StudentsDAO {
     }
 
     public void deleteStudent(String id) {
-        System.out.println(id);
+//        System.out.println(id);
+        deleteCertificatesByStudentsId(id);
         try (Connection conn = getConnection()) {
             PreparedStatement statement = conn.prepareStatement(DELETE_STUDENTS);
             statement.setString(1, id);
@@ -169,5 +172,21 @@ public class StudentsDAO {
             throw new RuntimeException("Error adding users", e);
         }
         return students;
+    }
+
+    public void deleteCertificatesByStudentsId(String id){
+        try (Connection conn = getConnection()) {
+            PreparedStatement statement = conn.prepareStatement(DELETE_CERTIFICATES_BY_STUDENT_ID);
+            statement.setString(1, id);
+            int result = statement.executeUpdate();
+            if (result > 0){
+//                JOptionPane.showMessageDialog(null, "Delete Student Successfully", "Delete Completed", JOptionPane.INFORMATION_MESSAGE);
+            }else{
+//                JOptionPane.showMessageDialog(null, "Delete Student Failed", "Delete Failed", JOptionPane.ERROR_MESSAGE);
+            }
+            closeConnection(conn);
+        } catch (SQLException e) {
+            throw new RuntimeException("Error Deleting student", e);
+        }
     }
 }

@@ -2,6 +2,7 @@ package DAO;
 
 import Model.Users;
 
+import javax.swing.*;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,7 +13,10 @@ public class SiteDAO {
     private DatabaseRepository databaseRepository;
     private static final String GET_USERS = "SELECT * FROM users";
     private static final String MAX_USER_ID = "SELECT MAX(user_id) FROM users";
+    private static final String MAX_ACC_ID = "SELECT MAX(account_id) FROM accounts";
     private static final String MAX_STUDENT_ID = "SELECT MAX(student_id) FROM students";
+    private static final String MAX_HISTORY_ID = "SELECT MAX(history_id) FROM histories";
+
     public SiteDAO(){
         this.databaseRepository = new DatabaseRepository();
     }
@@ -43,7 +47,7 @@ public class SiteDAO {
 //                return new HashMap<resultSet.getString(1), resultSet.getString(2)>;
                 stringHashMap.put("user_name", resultSet.getString(1));
                 stringHashMap.put("role", resultSet.getString(2));
-                return  stringHashMap;
+                return stringHashMap;
             }
             closeConnection(connection);
         } catch (SQLException e) {
@@ -76,6 +80,29 @@ public class SiteDAO {
 
         return userList;
     }
+    public String AUTO_ACC_ID(){
+        String nextAccID = "";
+        try (Connection conn = getConnection();
+             PreparedStatement statement = conn.prepareStatement(MAX_ACC_ID)){
+            ResultSet resultSet = statement.executeQuery();
+            int currentID = 0;
+
+            if(resultSet.next()){
+                String maxID = resultSet.getString(1);
+                if(maxID != null && maxID.startsWith("ACC")){
+                    currentID = Integer.parseInt(maxID.substring(3));
+                }
+            }
+
+            int nextID = currentID + 1;
+            nextAccID = "ACC" + String.format("%06d", nextID);
+
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+        return nextAccID;
+    }
+
     public String AUTO_ACC_USER_ID(){
         String nextUserID = "";
         try (Connection conn = getConnection();
@@ -121,4 +148,28 @@ public class SiteDAO {
         }
         return nextStudentID;
     }
+    public String AUTO_HISTORY_ID() {
+        String nextHistoryID = "";
+        try (Connection conn = getConnection();
+             PreparedStatement statement = conn.prepareStatement(MAX_HISTORY_ID)){
+            ResultSet resultSet = statement.executeQuery();
+            int currentID = 0;
+
+            if(resultSet.next()){
+                String maxID = resultSet.getString(1);
+                if(maxID != null && maxID.startsWith("HIST")){
+                    currentID = Integer.parseInt(maxID.substring(4));
+                }
+            }
+
+            int nextID = currentID + 1;
+            nextHistoryID = "HIST" + String.format("%06d", nextID);
+
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+        return nextHistoryID;
+    }
+
+
 }

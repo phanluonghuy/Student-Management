@@ -4,6 +4,7 @@ import Model.Accounts;
 import Model.History;
 import Model.Roles;
 
+import javax.swing.*;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +13,9 @@ public class LoginHistoryDAO {
 
     private DatabaseRepository databaseRepository;
     private static final String GET_ACC_BY_ID = "SELECT * FROM accounts where account_id = ?";
+    private static final String GET_ACC_BY_UN_PW = "SELECT * FROM accounts where user_name = ? and _password = ?";
     private static final String GET_ROLE_BY_ID = "SELECT * FROM roles where role_id = ?";
+    private static final String GET_LOGIN_HISTORY = "INSERT INTO `histories` VALUES(?, ?, ?)";
     public LoginHistoryDAO(){
         this.databaseRepository = new DatabaseRepository();
     }
@@ -83,8 +86,9 @@ public class LoginHistoryDAO {
             ResultSet resultSet = statement.executeQuery();
 
             if (resultSet.next()) {
+                String role_id = resultSet.getString("role_id");
                 String role_name = resultSet.getString("role_name");
-                roles = new Roles(id, role_name);
+                roles = new Roles(role_id, role_name);
             }
             closeConnection(conn);
         } catch (SQLException e) {
@@ -94,11 +98,47 @@ public class LoginHistoryDAO {
         return roles.getRole_name();
     }
 
-    public void addLoginHistory(){
-        try (Connection conn = getConnection()){
-            String query = "INSERT INTO ";
+    public String getAccIdByUserNameAndPassword(String username, String password){
+        Accounts accounts = null;
+
+        try (Connection conn = getConnection()) {
+            PreparedStatement statement = conn.prepareStatement(GET_ACC_BY_UN_PW);
+            statement.setString(1, username);
+            statement.setString(2, password);
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet.next()) {
+                String acc_id = resultSet.getString("account_id");
+                String user_id = resultSet.getString("user_id");
+                String student_list_id = resultSet.getString("student_list_id");
+                String role_id = resultSet.getString("role_id");
+                accounts = new Accounts(acc_id, user_id, student_list_id, username, password, role_id);
+//                System.out.println(accounts);
+            }
+            closeConnection(conn);
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Error getting accounts", e);
         }
+
+        return accounts.getAccount_id();
+    }
+
+    public void addLoginHistory(History history){
+        try (Connection conn = getConnection()) {
+            PreparedStatement statement = conn.prepareStatement(GET_LOGIN_HISTORY);
+            statement.setString(1, history.getHistory_id());
+            statement.setString(2, history.getAccount_id());
+            statement.setTimestamp(3, new Timestamp(history.getDate_perform().getTime()));
+
+            int result = statement.executeUpdate();
+
+            if (result > 0) {
+                JOptionPane.showMessageDialog(null, "Login Successfully", "Notice", JOptionPane.INFORMATION_MESSAGE);
+            }
+            closeConnection(conn);
+        } catch (SQLException e) {
+            throw new RuntimeException("Error getting login history", e);
+        }
+
     }
 }
